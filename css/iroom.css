@@ -1,0 +1,88 @@
+body{
+    font-family: Arial, sans-serif;
+    background-color: #F4F7F6;
+    margin: 0;
+    padding: 20px;
+}
+
+#contenedor{
+    background-color: #334155;
+    width: 80%;
+    margin: auto;
+    border: 2px dashed #1A2B2B;
+    padding: 15px;
+    overflow: hidden;
+}
+
+#titulo{
+    border: 1px dashed #1E293B;
+    margin-bottom: 10px;
+    padding: 15px;
+    text-align: center;
+    background-color:#1E293B;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#menu{
+    border: 1px dashed #1A2B2B;
+    margin-bottom: 10px;
+    padding: 15px;
+    text-align: center;
+    background-color: #3B6262;
+}
+#informacion{
+    border: 1px dashed #1A2B2B;
+    margin-bottom: 10px;
+    padding: 15px;
+    text-align: center;
+    background-color: #3B6262;
+}
+#habitacion{
+    float: left;
+    width: 48%;
+    border: 1px #2A4747;
+    padding: 10px;
+    box-sizing: border-box;
+}
+#sensores{
+    float: right;
+    width: 48%;
+    border: 1px #2A4747;
+    padding: 10px;
+    box-sizing: border-box;
+}
+#pie{
+    clear: both;
+    background-color: #ABCDCD;
+    margin-top: 10px;
+}
+
+
+#sensores table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#sensores th, #sensores td {
+    padding: 10px 20px;
+    text-align: left;
+}
+
+
+.boton-menu {
+    display: inline-block;
+    border: 1px dashed #1A2B2B;
+    padding: 10px 15px;
+    margin: 5px;
+    text-decoration: none;
+    color: #333;
+    background-color: #F4F7F6;
+}
+
+#menu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Room</title>
+    <link rel="stylesheet" type="text/css" href="css/iroom.css">
+</head>
+<body>
+    <main id="contenedor">
+        <header id="titulo">
+            <h1>Smart Room Project</h1>
+        </header>
+        <nav id="menu">
+            <a href="config.html" class="boton-menu">Configuracion</a>
+            <a href="minombre.html" class="boton-menu">Datos cliente</a>
+        </nav>
+        <aside id="informacion"></aside>
+        <section id="habitacion">
+            <h2>Datos de la habitacion</h2>
+            <a href="https://maps.google.com" target="_blank">Ver localizacion en Google Maps</a>
+            <ul>
+                <li>Ubicacion: Edificio Politecnico</li>
+                <li>Planta: 2</li>
+            </ul>
+            <img src="https://via.placeholder.com/150" alt="Foto de la habitacion">
+        </section>
+        <section id="sensores"> 
+            <h2>Datos de los sensores</h2>
+            <table>
+                <tr>
+                    <th>Sensor</th>
+                    <th>Valor</th>
+                </tr>
+                <tr>
+                    <th>Tº</th>
+                    <th>22ºC</th>
+                </tr>
+            </table>
+        </section>
+        <footer id="pie">
+            Universidad de Alcala
+        </footer>
+    </main>
+    <script>
+        var nombreGuardado = localStorage.getItem("fname");
+        if(nombreGuardado != null){
+            document.getElementById("informacion").innerHTML = "Bienvenido a smartroom " + nombreGuardado;
+        }
+    </script>
+</body>
+</html>

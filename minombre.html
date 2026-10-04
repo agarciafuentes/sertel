@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurar Nombre</title>
+</head>
+<body>
+    <main id="contenedor">
+        <h1>Introduce tu nombre</h1>
+        <label for="cajaNombre">Nombre:</label>
+        <input type="text" id="cajaNombre" placeholder="Escribe tu nombre aqui">
+        <button onclick="guardarNombre()">Guardar</button>
+        <br><br>
+        <a href="index.html">Volver</a>
+    </main>
+    <script>
+        function guardarNombre() {
+            var nombre = document.getElementById("cajaNombre").value;
+            localStorage.setItem("fname",nombre);
+            alert("Guardado.");
+        }
+    </script>
+</body>
+</html>

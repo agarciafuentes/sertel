@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Configuracion - Smart Room</title>
+    <link rel="stylesheet" type="text/css" href="css/iroom.css">
+</head>
+<body>
+    <main id="contenedor">
+        <header id="titulo">
+            <h1>Configuracion de la habitacion</h1>
+        </header>
+        <form action="datos.js" method="POST">
+            <div id="datos_estacion">
+                <h2>Datos de la habitacion</h2>
+                <label for="pais">Pais:</label>
+                <input type="text" id="pais" name="pais" list="lista_paises">
+                <datalist id="lista_paises">
+                    <option value="Alemania"></option>
+                    <option value="Bulgaria"></option>
+                    <option value="Croacia"></option>
+                    <option value="Dinamarca"></option>
+                    <option value="Espana"></option>
+                    <option value="Francia"></option>
+                    <option value="Grecia"></option>
+                    <option value="Hungria"></option>
+                    <option value="Italia"></option>
+                    <option value="Lituania"></option>
+                    <option value="Moldavia"></option>
+                    <option value="Noruega"></option>
+                    <option value="Portugal"></option>
+                    <option value="Rusia"></option>
+                    <option value="Suiza"></option>
+                    <option value="Turquia"></option>
+                    <option value="Ucrania"></option>
+                    <option value="Vaticano"></option>
+                </datalist>
+                <br><br>
+
+                <label for="ciudad">Ciudad:</label>
+                <input type="text" id="ciudad" name="ciudad"><br><br>
+
+                <label for="mapa_url">Coordenadas GPS (URL):</label>
+                <input type="url" id="mapa_url" name="mapa_url"><br><br>
+
+                <label for="foto_estacion">Foto:</label>
+                <input type="file" id="foto_estacion" name="foto_estacion"><br><br>
+
+                <label for="contrasena">Password:</label>
+                <input type="password" id="contrasena" name="contrasena"><br><br>
+
+            </div>
+
+            <div id="sensores_config">
+                <h2>Selecciona los sensores</h2>
+
+                <input type="checkbox" id="sens_temp" name="sensor" value="temperatura">
+                <label for="sens_temp">Temperatura</label><br>
+
+                <input type="checkbox" id="sens_hum" name="sensor" value="humedad">
+                <label for="sens_hum">Humedad</label><br>
+
+                <input type="checkbox" id="sens_son" name="sensor" value="sonido">
+                <label for="sens_son">Sonido</label><br>
+
+                <input type="checkbox" id="sens_luz" name="sensor" value="luz">
+                <label for="sens_luz">Luz</label><br>
+
+                <input type="checkbox" id="sens_mov" name="sensor" value="movimiento">
+                <label for="sens_mov">Movimiento</label><br>
+
+                <h3>Configure alertas</h3>
+
+                <label for="tmax">Temperatura maxima:</label>
+                <input type="number" name="temp_max" id="tmax" min="-20" max="45" step="1"><br><br>
+                
+                <label for="tmin">Temperatura minima:</label>
+                <input type="number" name="temp_min" id="tmin" min="-20" max="45" step="1"><br><br>
+
+                <label for="dif_temp">Diferencia de temperatura:</label>
+                <output id="dif_temp" name="diferencia_temp"></output><br><br>
+             </div>
+            <input type="submit" value="Enviar datos">
+        </form>
+        <footer id="pie">
+            <a href="index.html">Volver a la pagina principal</a>
+        </footer>
+    </main>
+    <script>
+        const inputMax = document.getElementById("tmax");
+        const inputMin = document.getElementById("tmin");
+        const outputDif = document.getElementsByName("diferencia_temp")[0];
+
+        function calcularYValidar() {
+            let max = parseInt(inputMax.value);
+            let min = parseInt(inputMin.value);
+
+            if (!isNaN(max) && !isNaN(min)) {
+                if (max < min) {
+                    inputMax.setCustomValidity("La Tº maxima debe ser mayor o igual a la minima.");
+                    outputDif.value = "Error";
+                } else {
+                    inputMax.setCustomValidity("");
+                    let diferencia = max - min;
+                    outputDif.value = diferencia + " grados C";
+                }
+            } else {
+                inputMax.setCustomValidity("");
+            }
+        }
+
+        inputMax.addEventListener("input", calcularYValidar);
+        inputMin.addEventListener("input", calcularYValidar);
+    </script>
+<script src="datos.js"></script>
+</body>
+</html>
