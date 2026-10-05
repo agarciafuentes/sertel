@@ -114,7 +114,7 @@ Se han utilizado las herramientas oficiales del W3C para validar el HTML (W3C Nu
 
 | Herramienta | Archivo | Resultado / problema identificado | Corrección aplicada |
 | :--- | :--- | :--- | :--- |
-| **W3C Nu Html Checker** | index.html | *Warning: Section lacks heading.* El estándar recomienda identificar con un encabezado `h2`–`h6` el contenido de cada `<section>`. | Se añadió un `<h2>` en las secciones «Datos de la habitación» y «Datos de los sensores». |
+| **W3C Nu Html Checker** | index.html (versión original) | Dos avisos: *Warning: Section lacks heading* en `<section id="habitacion">` (línea 18) y en `<section id="sensores">` (línea 26). El estándar recomienda identificar con un encabezado `h2`–`h6` el contenido de cada `<section>`. | Se añadió un `<h2>` en las secciones «Datos de la habitación» y «Datos de los sensores». |
 | **W3C Nu Html Checker** | index.html (versión final) | Sin errores ni avisos. | — |
 | **W3C Nu Html Checker** | config.html (versión final) | Sin errores ni avisos. | — |
 | **W3C Nu Html Checker** | minombre.html (versión final) | Sin errores ni avisos. | — |
@@ -123,8 +123,8 @@ Se han utilizado las herramientas oficiales del W3C para validar el HTML (W3C Nu
 
 ### Capturas de validación
 
-**index.html (aviso original):**
-![Aviso en index.html](capturas/val_index_warning.png)
+**index.html (avisos originales):**
+![Avisos en index.html](capturas/val_index_warning.jpg)
 
 **index.html (validación final):**
 ![Validación de index.html](capturas/validacion_index_html.png)
