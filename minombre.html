@@ -2,22 +2,33 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Configurar Nombre</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Configurar Nombre - Smart Room</title>
+    <link rel="stylesheet" type="text/css" href="css/iroom.css">
 </head>
 <body>
     <main id="contenedor">
-        <h1>Introduce tu nombre</h1>
-        <label for="cajaNombre">Nombre:</label>
-        <input type="text" id="cajaNombre" placeholder="Escribe tu nombre aqui">
-        <button onclick="guardarNombre()">Guardar</button>
-        <br><br>
-        <a href="index.html">Volver</a>
+        <header id="titulo">
+            <h1>Introduce tu nombre</h1>
+        </header>
+        <form id="form_nombre" onsubmit="guardarNombre(event)">
+            <div id="datos_nombre">
+                <div class="campo">
+                    <label for="cajaNombre">Nombre:</label>
+                    <input type="text" id="cajaNombre" name="nombre" placeholder="Escribe tu nombre aqui" required>
+                </div>
+                <input type="submit" value="Guardar">
+            </div>
+        </form>
+        <footer id="pie">
+            <a href="index.html">Volver a la pagina principal</a>
+        </footer>
     </main>
     <script>
-        function guardarNombre() {
+        function guardarNombre(event) {
+            event.preventDefault();
             var nombre = document.getElementById("cajaNombre").value;
-            localStorage.setItem("fname",nombre);
+            localStorage.setItem("fname", nombre);
             alert("Guardado.");
         }
     </script>

@@ -208,12 +208,13 @@ img {
   background-color: var(--pie);
 }
 
-/* Zonas de contenido (fondo blanco): las dos de la pagina de inicio
-   y las dos del formulario de configuracion */
+/* Zonas de contenido (fondo blanco): las dos de la pagina de inicio,
+   las dos del formulario de configuracion y la del formulario del nombre */
 #habitacion,
 #sensores,
 #datos_estacion,
-#sensores_config {
+#sensores_config,
+#datos_nombre {
   background-color: var(--tarjeta);
   border: 1px solid var(--borde);
   border-radius: 6px;
@@ -268,9 +269,16 @@ th {
 }
 
 #datos_estacion,
-#sensores_config {
+#sensores_config,
+#datos_nombre {
   flex: 1 1 45%;
   min-width: 0;
+}
+
+/* En minombre.html solo hay una tarjeta: se limita su ancho y,
+   gracias al justify-content: center del formulario, queda centrada */
+#datos_nombre {
+  max-width: 520px;
 }
 
 /* Cada pareja etiqueta + campo va en un div.campo */
@@ -358,7 +366,8 @@ input[type="submit"]:hover {
    Va aqui, despues de las reglas del formulario, para que se aplique. */
 @media (max-width: 700px) {
   #datos_estacion,
-  #sensores_config {
+  #sensores_config,
+  #datos_nombre {
     flex-basis: 100%;
   }
 }
