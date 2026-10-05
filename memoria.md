@@ -1,46 +1,150 @@
-﻿# Memoria de Prácticas: Desarrollo Web (HTML5 y CSS3)
+# Memoria de Prácticas: Desarrollo Web (HTML5 y CSS3)
 
-## Apartado 2: Validación de la Temperatura
-Para garantizar que la temperatura máxima introducida en el formulario sea mayor o igual que la mínima, se ha utilizado la API de validación nativa de HTML5 mediante JavaScript (setCustomValidity()).
+Práctica P1 – Smart Room · Servicios Telemáticos · Universidad de Alcalá
 
-Se ha implementado un script que, mediante el evento input, lee en tiempo real los valores de los campos de temperatura. Si el valor máximo es inferior al mínimo, se ejecuta inputMax.setCustomValidity("La temperatura máxima debe ser mayor o igual a la mínima"), bloqueando el envío del formulario y mostrando un aviso nativo del navegador. Si los valores son correctos, el mensaje se limpia y se calcula la diferencia en la etiqueta <output>.
+---
 
-*Nota:* Esta es una validación del lado del cliente orientada a mejorar la experiencia de usuario (UX). Por seguridad, siempre debe complementarse con una validación en el lado del servidor.
+## Apartado 2: Validación de la temperatura
 
-## Apartado 4: Control de Caché (Cabeceras HTTP)
-Se ha procedido a analizar la gestión de la caché en los recursos de la web estudiando las cabeceras HTTP de respuesta:
+El enunciado pide comprobar que la temperatura máxima sea mayor o igual que la mínima combinando restricciones HTML con una comprobación en JavaScript. La solución tiene dos niveles que se complementan.
 
-- **no-cache**: Esta directiva permite que el navegador almacene el recurso en su memoria caché local, pero le obliga a validar siempre con el servidor (mediante validadores como ETag o Last-Modified) si el archivo ha sufrido modificaciones. Si no ha cambiado, usa el guardado; si cambió, lo descarga de nuevo.
-- **no-store**: Es la directiva más restrictiva. Prohíbe totalmente al navegador guardar el recurso en el disco duro o en caché bajo ninguna circunstancia. Es útil para páginas que manejan datos confidenciales o bancarios.
+**1. Restricciones HTML (nivel declarativo).** Los dos campos de alerta son `<input type="number">` con los atributos `min="-20"`, `max="45"` y `step="1"`. Con ellos, el navegador comprueba por sí solo, al enviar el formulario, que el valor sea numérico, esté entre −20 °C y 45 °C y sea un número entero. Estas restricciones no pueden comparar un campo con otro, y por eso hace falta el segundo nivel.
 
-**Justificación para recursos estáticos versionados:** Para archivos como hojas de estilo (.css), imágenes o scripts, usar 
-o-cache es menos eficiente. Lo ideal es utilizar un tiempo de caché largo (max-age) y, cuando se actualiza el archivo, cambiarle el nombre (ej. estilo_v2.css). Esto se conoce como "versionado de recursos" y evita tener que consultar al servidor constantemente si el archivo ha cambiado.
+**2. Comprobación en JavaScript (nivel dinámico).** Se ha implementado un script que escucha el evento `input` de ambos campos. En cada cambio lee los dos valores y, si ambos son números:
 
-## Apartado 6: Actualización mediante eventos SSE (Opcional)
-Para lograr que los datos de los sensores de la habitación se actualicen automáticamente sin que el cliente tenga que recargar la página, se propone una arquitectura basada en **Server-Sent Events (SSE)**. 
+- Si el máximo es inferior al mínimo, se ejecuta `inputMax.setCustomValidity("La Tº maxima debe ser mayor o igual a la minima.")` y el elemento `<output>` muestra «Error». Con un mensaje de validez personalizado, el campo pasa a ser inválido: el navegador bloquea el envío del formulario y muestra ese texto como aviso nativo, y la hoja de estilos marca el campo en rojo.
+- Si los valores son correctos, el mensaje se limpia con `setCustomValidity("")` y el `<output>` muestra la diferencia entre ambas temperaturas (por ejemplo, «15 grados C»).
 
-El servidor expondría un endpoint (por ejemplo, /api/sensores/stream) que devuelve cabeceras HTTP específicas (Content-Type: text/event-stream). Por su parte, el navegador web usaría el objeto JavaScript EventSource para conectarse a ese endpoint y mantener una conexión unidireccional abierta de forma permanente. Cada vez que el servidor detecta una nueva medida en un sensor, empuja un evento de texto al cliente y el JavaScript actualiza dinámicamente el DOM (la tabla de sensores) mediante manejadores como onmessage.
+*Nota:* se trata de una validación en el lado del cliente, orientada a mejorar la experiencia de usuario. Por seguridad, siempre debe complementarse con una validación en el servidor.
+
+---
+
+## Apartado 4: Control de caché (cabeceras HTTP)
+
+### 4.1 Diferencia entre `no-cache` y `no-store`
+
+- **`no-cache`**: el navegador **puede almacenar** el recurso en su caché local, pero está obligado a validarlo con el servidor antes de usarlo (mediante validadores como `ETag` o `Last-Modified`). Si el archivo no ha cambiado, el servidor responde `304 Not Modified` sin enviar el contenido y el navegador usa su copia; si ha cambiado, responde `200` con el contenido nuevo.
+- **`no-store`**: es la directiva más restrictiva. Prohíbe al navegador y a cualquier caché intermedia **guardar** el recurso en ningún momento. Es útil para páginas que manejan datos confidenciales (por ejemplo, información bancaria).
+
+En resumen: `no-cache` significa «guárdalo, pero pregunta antes de usarlo», y `no-store` significa «no lo guardes».
+
+### 4.2 Política elegida para el documento HTML principal
+
+Para `index.html` se elige `Cache-Control: no-cache`. Es el punto de entrada de la aplicación y su contenido cambia cada vez que se actualiza la web, además de ser el documento que enlaza la hoja de estilos y los scripts. Si se almacenara durante mucho tiempo, los usuarios seguirían viendo una versión antigua. Con `no-cache` el navegador comprueba en cada visita si ha cambiado y, si no es así, recibe una respuesta `304` muy ligera. No es necesario `no-store`, porque la página no contiene información confidencial.
+
+### 4.3 Configuración en Apache
+
+> **PENDIENTE:** aplicar esta configuración en el servidor del Apartado 7 y comprobar que funciona antes de dar este apartado por cerrado.
+
+Se activa el módulo de cabeceras con `sudo a2enmod headers` y se añade lo siguiente al fichero del host virtual:
+
+```apache
+<Directory /var/www/iroom>
+    Require all granted
+    <FilesMatch "\.html$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+</Directory>
+```
+
+Después se recarga la configuración con `sudo service apache2 reload`.
+
+### 4.4 Cabeceras observadas y comparación antes y después
+
+> **PENDIENTE:** rellenar con lo observado en la pestaña **Red** de las herramientas de desarrollo del navegador, antes y después de aplicar la configuración. Incluir las capturas en la carpeta `capturas`.
+
+| Situación | Cabeceras de respuesta observadas | Código HTTP | Comportamiento observado |
+| :--- | :--- | :--- | :--- |
+| Antes · recarga normal | *(completar)* | *(completar)* | *(completar)* |
+| Antes · recarga forzada | *(completar)* | *(completar)* | *(completar)* |
+| Después · recarga normal | *(completar)* | *(completar)* | *(completar)* |
+| Después · recarga forzada | *(completar)* | *(completar)* | *(completar)* |
+
+### 4.5 Recursos estáticos versionados
+
+Para archivos como hojas de estilo (`.css`), scripts o imágenes, usar `no-cache` es menos eficiente: obliga a consultar al servidor en cada uso, aunque casi nunca cambien. Lo ideal es darles una caducidad larga con `max-age` y, cuando el archivo se actualiza, **cambiarle el nombre** (por ejemplo, `iroom.v2.css`), de modo que el navegador lo trate como un recurso nuevo. Esto se conoce como versionado de recursos y permite una política como `Cache-Control: public, max-age=31536000, immutable`, que evita preguntar al servidor.
+
+En esta práctica los archivos no llevan versión en el nombre (`iroom.css`), por lo que una caducidad muy larga haría que los visitantes siguieran viendo estilos antiguos tras una actualización. Mientras no se versionen, conviene una caducidad corta o usar `no-cache`.
+
+---
+
+## Apartado 6: Actualización mediante eventos enviados por el servidor (SSE) — Opcional
+
+Para que los datos de los sensores se actualicen sin que el usuario recargue la página, se propone una arquitectura basada en **Server-Sent Events (SSE)**: el navegador abre una única conexión HTTP con el servidor y este va enviando por ella los datos nuevos. La comunicación es unidireccional (del servidor al cliente), que es justo lo que necesita un panel de sensores. Frente al *polling*, evita peticiones repetidas que a menudo no traen nada nuevo, y frente a WebSocket es más sencillo porque funciona sobre HTTP normal y el navegador se reconecta solo.
+
+**Arquitectura.** El servidor expone un recurso (por ejemplo, `/api/sensores/stream`), atendido por un script del servidor (PHP, Python, Node...), porque un servidor de archivos estáticos no puede mantener la conexión abierta ni generar eventos. El script responde con las cabeceras:
+
+```
+Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+```
+
+**Formato de los mensajes `text/event-stream`.** Es texto plano. Cada mensaje está formado por líneas del tipo `campo: valor` y termina con una **línea en blanco**. Los campos habituales son `data` (el contenido, obligatorio), `event` (nombre del evento; si no se indica, es `message`), `id` (identificador, que el navegador reenvía al reconectar) y `retry` (milisegundos de espera para reconectar). Las líneas que empiezan por `:` son comentarios.
+
+```
+event: sensores
+id: 42
+data: {"temperatura": 22.5, "humedad": 41}
+
+```
+
+**Conexión desde el navegador con `EventSource`:**
+
+```javascript
+const fuente = new EventSource("/api/sensores/stream");
+
+fuente.addEventListener("sensores", (evento) => {
+    const datos = JSON.parse(evento.data);
+    document.getElementById("valor-temperatura").textContent = datos.temperatura + "ºC";
+});
+
+fuente.onerror = () => {
+    console.log("Conexión perdida; el navegador reintentará automáticamente.");
+};
+```
+
+**Procedimiento de actualización de la interfaz.** Cada vez que el servidor detecta una medida nueva, escribe un mensaje en la conexión abierta. El navegador lo recibe, dispara el manejador del evento y el código JavaScript modifica el DOM: en este caso, el contenido de la celda de la tabla de sensores, a la que se le asignaría un `id` (por ejemplo, `valor-temperatura`). Si la conexión se cae, `EventSource` reintenta de forma automática y envía la cabecera `Last-Event-ID` para que el servidor pueda retomar desde el último evento recibido.
+
+---
 
 ## Apartado 9: Validación y calidad del código
-Se han utilizado las herramientas oficiales del W3C para validar la sintaxis del código de la práctica. A continuación, se detalla la tabla con las herramientas utilizadas, los problemas encontrados y las correcciones aplicadas:
 
-| Herramienta | Archivo | Problema / Advertencia identificada | Solución aplicada |
+Se han utilizado las herramientas oficiales del W3C para validar el HTML (W3C Nu Html Checker, en `validator.w3.org`) y la hoja de estilos (W3C CSS Validation Service, en `jigsaw.w3.org/css-validator`), y la consola de las herramientas de desarrollo del navegador para comprobar que no aparecen errores. La siguiente tabla recoge las herramientas utilizadas, los problemas identificados y las correcciones aplicadas.
+
+| Herramienta | Archivo | Resultado / problema identificado | Corrección aplicada |
 | :--- | :--- | :--- | :--- |
-| **W3C Nu Html Checker** | Index.html | *Warning: Section lacks heading.* El estándar recomienda incluir elementos h2-h6 para identificar el contenido de las etiquetas <section>. | Se ha añadido un encabezado <h2> dentro de las secciones de "Datos de la habitación" y "Datos de los sensores" para aportar una jerarquía coherente. |
-| **W3C Nu Html Checker** | config.html | *Error: The heading h3 follows the heading h1, skipping 1 heading level.* Salto en la jerarquía de encabezados. | Se han reemplazado las sub-secciones que usaban <h3> por <h2> para mantener la progresión semántica lógica que requiere HTML5 tras el <h1> principal. |
-| **W3C Nu Html Checker** | \minombre.html\ | *Warning: This document has heading elements but none of them has a computed heading level of 1.* Falta el encabezado principal de la pagina. | Se ha cambiado la etiqueta \<h2>\ por un \<h1>\ para cumplir con las reglas de accesibilidad que exigen un titulo principal por documento. |
+| **W3C Nu Html Checker** | index.html | *Warning: Section lacks heading.* El estándar recomienda identificar con un encabezado `h2`–`h6` el contenido de cada `<section>`. | Se añadió un `<h2>` en las secciones «Datos de la habitación» y «Datos de los sensores». |
+| **W3C Nu Html Checker** | index.html (versión final) | Sin errores ni avisos. | — |
+| **W3C Nu Html Checker** | config.html (versión final) | Sin errores ni avisos. | — |
+| **W3C Nu Html Checker** | minombre.html (versión final) | Sin errores ni avisos. | — |
+| **W3C CSS Validation Service** | css/iroom.css (versión final) | Sin errores (CSS nivel 3 + SVG). | — |
+| **Consola de Microsoft Edge (DevTools)** | index.html | Al abrir la página como archivo local aparecía el mensaje *«Unsafe attempt to load URL file:///... from frame with URL file:///...»*. | El mensaje desaparece al abrir la página en una ventana InPrivate, sin extensiones, por lo que no procede del código de la práctica. Con ese método, las consolas de las tres páginas aparecen sin errores («No issues»). |
 
-### Capturas de Validacion
+### Capturas de validación
 
-**Index.html (Advertencia original):**
-![Warning Index](capturas/val_index_warning.png)
+**index.html (aviso original):**
+![Aviso en index.html](capturas/val_index_warning.png)
 
-**config.html (Validacion superada):**
-![OK Config](capturas/val_config_ok.png)
+**index.html (validación final):**
+![Validación de index.html](capturas/validacion_index_html.png)
 
-**minombre.html (Advertencia original):**
-![Warning Minombre](capturas/val_minombre_warning.png)
+**config.html (validación final):**
+![Validación de config.html](capturas/validacion_config_html.png)
 
-**minombre.html (Validacion superada tras corregir el h1):**
-![OK Minombre](capturas/val_minombre_ok.png)
+**minombre.html (validación final):**
+![Validación de minombre.html](capturas/validacion_minombre_html.png)
 
+**iroom.css (validación final):**
+![Validación de iroom.css](capturas/validacion_css.png)
+
+### Capturas de la consola del navegador
+
+**index.html:**
+![Consola de index.html](capturas/consola_index.png)
+
+**config.html:**
+![Consola de config.html](capturas/consola_config.png)
+
+**minombre.html:**
+![Consola de minombre.html](capturas/consola_minombre.png)
