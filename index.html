@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Smart Room</title>
     <link rel="stylesheet" type="text/css" href="css/iroom.css">
 </head>
@@ -22,7 +23,7 @@
                 <li>Ubicacion: Edificio Politecnico</li>
                 <li>Planta: 2</li>
             </ul>
-            <img src="https://via.placeholder.com/150" alt="Foto de la habitacion">
+            <img src="images/habitacion.jpg" alt="Foto de la habitacion">
         </section>
         <section id="sensores"> 
             <h2>Datos de los sensores</h2>
@@ -32,8 +33,8 @@
                     <th>Valor</th>
                 </tr>
                 <tr>
-                    <th>Tº</th>
-                    <th>22ºC</th>
+                    <td>Tº</td>
+                    <td>22ºC</td>
                 </tr>
             </table>
         </section>
@@ -44,7 +45,7 @@
     <script>
         var nombreGuardado = localStorage.getItem("fname");
         if(nombreGuardado != null){
-            document.getElementById("informacion").innerHTML = "Bienvenido a smartroom " + nombreGuardado;
+               document.getElementById("informacion").innerHTML = "Hola " + nombreGuardado + ": Bienvenido a Smart Room";
         }
     </script>
 </body>

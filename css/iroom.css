@@ -1,88 +1,364 @@
-body{
-    font-family: Arial, sans-serif;
-    background-color: #F4F7F6;
-    margin: 0;
-    padding: 20px;
+/* =========================================================
+   iroom.css - Hoja de estilos de Smart Room (P1 HTML/CSS)
+   La usan index.html, config.html y minombre.html
+   Se mantiene la paleta de colores original del proyecto.
+   ========================================================= */
+
+
+/* ---------- 1. Variables de color ----------
+   Los colores se definen una sola vez aqui y se usan con var(...).
+   Si quieres cambiar un color, lo cambias en este bloque y se
+   actualiza en toda la web. */
+:root {
+  --fondo-pagina: #F4F7F6;   /* fondo general de la pagina */
+  --marco:        #334155;   /* marco oscuro que rodea todo */
+  --titulo:       #1E293B;   /* cabecera y color de texto principal */
+  --barra:        #3B6262;   /* menu, informacion, subtitulos y boton */
+  --pie:          #ABCDCD;   /* pie de pagina */
+  --tarjeta:      #FFFFFF;   /* fondo de las zonas de contenido */
+  --texto:        #1E293B;   /* texto normal */
+  --texto-claro:  #FFFFFF;   /* texto sobre fondos oscuros */
+  --enlace:       #1E40AF;   /* enlaces (buen contraste en fondo claro) */
+  --borde:        #CBD5E1;   /* lineas finas */
+  --borde-campo:  #64748B;   /* borde de los campos del formulario */
+  --error:        #B91C1C;   /* campos con un valor no valido */
+  --foco:         #FFD54A;   /* anillo de foco al navegar con teclado */
 }
 
-#contenedor{
-    background-color: #334155;
-    width: 80%;
-    margin: auto;
-    border: 2px dashed #1A2B2B;
-    padding: 15px;
-    overflow: hidden;
+
+/* ---------- 2. Reglas generales ---------- */
+
+/* Con border-box, el padding y el borde NO hacen crecer el ancho
+   de un elemento: es mucho mas facil calcular tamanos. */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-#titulo{
-    border: 1px dashed #1E293B;
-    margin-bottom: 10px;
-    padding: 15px;
-    text-align: center;
-    background-color:#1E293B;
-    font-size: 24px;
-    font-weight: bold;
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;          /* 1rem = tamano base del navegador (16px) */
+  line-height: 1.5;
+  color: var(--texto);
+  background-color: var(--fondo-pagina);
+  margin: 0;
+  padding: 20px;
 }
 
-#menu{
-    border: 1px dashed #1A2B2B;
-    margin-bottom: 10px;
-    padding: 15px;
-    text-align: center;
-    background-color: #3B6262;
+/* Jerarquia de textos: tamano (font-size), grosor (font-weight)
+   y color distinguen titulo, subtitulos y texto normal. */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
 }
-#informacion{
-    border: 1px dashed #1A2B2B;
-    margin-bottom: 10px;
-    padding: 15px;
-    text-align: center;
-    background-color: #3B6262;
+
+h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--barra);
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--barra);
 }
-#habitacion{
-    float: left;
-    width: 48%;
-    border: 1px #2A4747;
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.75rem;
+}
+
+a {
+  color: var(--enlace);
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+ul {
+  margin: 0.75rem 0;
+  padding-left: 1.4rem;
+}
+
+img {
+  display: block;
+  max-width: 100%;          /* la imagen nunca se sale de su caja */
+  height: auto;
+  margin-top: 1rem;
+  border-radius: 6px;
+}
+
+
+/* ---------- 3. Foco visible con el teclado ----------
+   Cuando alguien navega con la tecla Tab, el elemento activo
+   se rodea de un anillo amarillo con un borde oscuro interior,
+   para que se vea tanto sobre fondos claros como oscuros. */
+:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--titulo);
+}
+
+
+/* ---------- 4. Estructura de la pagina (layout) ----------
+   #contenedor es una caja flexible (flexbox) que reparte sus zonas en filas:
+
+   - flex-wrap: wrap -> cuando una zona no cabe en la fila, pasa a la siguiente.
+   - titulo y pie ocupan el 100%: una fila entera cada uno.
+   - menu, informacion, habitacion y sensores ocupan el 45% cada uno,
+     asi que solo caben DOS por fila:
+         menu | informacion        habitacion | sensores
+   - "flex: 1 1 45%" son tres valores: crece (1), se encoge (1) y
+     mide 45% de partida. Al poder crecer, las dos zonas de una fila
+     se reparten el espacio que sobra y llegan hasta los bordes.
+   - Las zonas de una misma fila miden lo mismo de alto (es el
+     comportamiento por defecto de flexbox). */
+#contenedor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;                /* separacion entre zonas */
+  width: 90%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 15px;
+  background-color: var(--marco);
+  border-radius: 8px;
+}
+
+#titulo,
+#pie {
+  flex: 0 0 100%;           /* no crece, no se encoge, ocupa toda la fila */
+}
+
+#menu,
+#informacion,
+#habitacion,
+#sensores {
+  flex: 1 1 45%;
+  min-width: 0;             /* permite que el contenido se ajuste sin desbordar */
+}
+
+/* Pantallas pequenas (menos de 700 px de ancho): una sola columna.
+   Si cada zona mide el 100%, solo cabe una por fila. */
+@media (max-width: 700px) {
+  body {
     padding: 10px;
-    box-sizing: border-box;
-}
-#sensores{
-    float: right;
-    width: 48%;
-    border: 1px #2A4747;
-    padding: 10px;
-    box-sizing: border-box;
-}
-#pie{
-    clear: both;
-    background-color: #ABCDCD;
-    margin-top: 10px;
-}
+  }
 
-
-#sensores table {
+  #contenedor {
     width: 100%;
-    border-collapse: collapse;
+  }
+
+  #menu,
+  #informacion,
+  #habitacion,
+  #sensores {
+    flex-basis: 100%;
+  }
 }
 
-#sensores th, #sensores td {
-    padding: 10px 20px;
-    text-align: left;
+
+/* ---------- 5. Cada zona de la pagina ---------- */
+
+/* Cabecera con el titulo */
+#titulo {
+  background-color: var(--titulo);
+  color: var(--texto-claro);
+  padding: 15px;
+  text-align: center;
+  border-radius: 6px;
 }
 
-
-.boton-menu {
-    display: inline-block;
-    border: 1px dashed #1A2B2B;
-    padding: 10px 15px;
-    margin: 5px;
-    text-decoration: none;
-    color: #333;
-    background-color: #F4F7F6;
+/* Menu e informacion: dos barras del mismo color, una al lado de la otra */
+#menu,
+#informacion {
+  background-color: var(--barra);
+  color: var(--texto-claro);
+  padding: 15px;
+  border-radius: 6px;
 }
 
 #menu {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+  display: flex;
+  flex-wrap: wrap;          /* si los botones no caben, pasan a la linea siguiente */
+  align-items: center;
+  gap: 10px;
 }
 
+#informacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 600;
+}
+
+.boton-menu {
+  display: inline-block;
+  padding: 10px 15px;
+  background-color: var(--fondo-pagina);
+  color: var(--texto);
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--texto);
+  border-radius: 4px;
+}
+
+.boton-menu:hover {
+  background-color: var(--pie);
+}
+
+/* Zonas de contenido (fondo blanco): las dos de la pagina de inicio
+   y las dos del formulario de configuracion */
+#habitacion,
+#sensores,
+#datos_estacion,
+#sensores_config {
+  background-color: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 15px;
+}
+
+#sensores {
+  overflow-x: auto;         /* si la tabla es muy ancha, hace scroll dentro de su caja */
+}
+
+/* Tabla de sensores */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--borde);
+}
+
+th {
+  background-color: #E2E8F0;
+  font-weight: 700;
+}
+
+/* Pie de pagina */
+#pie {
+  background-color: var(--pie);
+  color: var(--texto);
+  padding: 12px;
+  text-align: center;
+  font-size: 0.9rem;
+  border-radius: 6px;
+}
+
+
+/* ---------- 6. Formularios (config.html y minombre.html) ---------- */
+
+/* El formulario ocupa una fila entera de #contenedor y por dentro
+   funciona igual que #contenedor: una caja flexible con filas.
+     datos de la habitacion | sensores y alertas
+     boton de enviar (solo, en su fila y centrado) */
+#contenedor > form {
+  flex: 0 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;  /* centra lo que quede solo en una fila (el boton) */
+  gap: 12px;
+}
+
+#datos_estacion,
+#sensores_config {
+  flex: 1 1 45%;
+  min-width: 0;
+}
+
+/* Cada pareja etiqueta + campo va en un div.campo */
+.campo {
+  margin-bottom: 1rem;
+}
+
+/* Etiquetas: encima de su campo, en negrita */
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+/* Campos de texto, URL, contrasena, numeros y archivo */
+input[type="text"],
+input[type="url"],
+input[type="password"],
+input[type="number"],
+input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;            /* mismo tipo y tamano de letra que el resto */
+  color: var(--texto);
+  background-color: #FFFFFF;
+  border: 1px solid var(--borde-campo);
+  border-radius: 4px;
+}
+
+/* Si el valor no es valido (fuera de rango, URL mal escrita,
+   maxima menor que minima...), el campo se marca en rojo */
+input:invalid {
+  border-color: var(--error);
+  background-color: #FEF2F2;
+}
+
+/* Casillas de los sensores: casilla y texto en la misma linea */
+.opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.opcion input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+}
+
+.opcion label {
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Resultado de la diferencia de temperatura */
+output {
+  display: block;
+  min-height: 2.5rem;
+  padding: 8px 10px;
+  background-color: #E2E8F0;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+/* Boton de enviar */
+input[type="submit"] {
+  flex: 0 0 auto;           /* mide lo que mide su texto, sin estirarse */
+  padding: 12px 28px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--texto-claro);
+  background-color: var(--barra);
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover {
+  background-color: var(--titulo);
+}
+
+/* Pantallas pequenas: el formulario tambien pasa a una columna.
+   Va aqui, despues de las reglas del formulario, para que se aplique. */
+@media (max-width: 700px) {
+  #datos_estacion,
+  #sensores_config {
+    flex-basis: 100%;
+  }
+}

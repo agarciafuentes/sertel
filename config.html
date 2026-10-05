@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Configuracion - Smart Room</title>
     <link rel="stylesheet" type="text/css" href="css/iroom.css">
 </head>
@@ -10,76 +11,103 @@
         <header id="titulo">
             <h1>Configuracion de la habitacion</h1>
         </header>
-        <form action="datos.js" method="POST">
+        <form action="datos.js" method="POST" onsubmit="procesarDatos(event)">
             <div id="datos_estacion">
                 <h2>Datos de la habitacion</h2>
-                <label for="pais">Pais:</label>
-                <input type="text" id="pais" name="pais" list="lista_paises">
-                <datalist id="lista_paises">
-                    <option value="Alemania"></option>
-                    <option value="Bulgaria"></option>
-                    <option value="Croacia"></option>
-                    <option value="Dinamarca"></option>
-                    <option value="Espana"></option>
-                    <option value="Francia"></option>
-                    <option value="Grecia"></option>
-                    <option value="Hungria"></option>
-                    <option value="Italia"></option>
-                    <option value="Lituania"></option>
-                    <option value="Moldavia"></option>
-                    <option value="Noruega"></option>
-                    <option value="Portugal"></option>
-                    <option value="Rusia"></option>
-                    <option value="Suiza"></option>
-                    <option value="Turquia"></option>
-                    <option value="Ucrania"></option>
-                    <option value="Vaticano"></option>
-                </datalist>
-                <br><br>
 
-                <label for="ciudad">Ciudad:</label>
-                <input type="text" id="ciudad" name="ciudad"><br><br>
+                <div class="campo">
+                    <label for="pais">Pais:</label>
+                    <input type="text" id="pais" name="pais" list="lista_paises">
+                    <datalist id="lista_paises">
+                        <option value="Alemania"></option>
+                        <option value="Bulgaria"></option>
+                        <option value="Croacia"></option>
+                        <option value="Dinamarca"></option>
+                        <option value="Espana"></option>
+                        <option value="Francia"></option>
+                        <option value="Grecia"></option>
+                        <option value="Hungria"></option>
+                        <option value="Italia"></option>
+                        <option value="Lituania"></option>
+                        <option value="Moldavia"></option>
+                        <option value="Noruega"></option>
+                        <option value="Portugal"></option>
+                        <option value="Rusia"></option>
+                        <option value="Suiza"></option>
+                        <option value="Turquia"></option>
+                        <option value="Ucrania"></option>
+                        <option value="Vaticano"></option>
+                    </datalist>
+                </div>
 
-                <label for="mapa_url">Coordenadas GPS (URL):</label>
-                <input type="url" id="mapa_url" name="mapa_url"><br><br>
+                <div class="campo">
+                    <label for="ciudad">Ciudad:</label>
+                    <input type="text" id="ciudad" name="ciudad">
+                </div>
 
-                <label for="foto_estacion">Foto:</label>
-                <input type="file" id="foto_estacion" name="foto_estacion"><br><br>
+                <div class="campo">
+                    <label for="gps">Coordenadas GPS:</label>
+                    <input type="text" id="gps" name="gps" placeholder="40.4168, -3.7038">
+                </div>
 
-                <label for="contrasena">Password:</label>
-                <input type="password" id="contrasena" name="contrasena"><br><br>
+                <div class="campo">
+                    <label for="mapa_url">Enlace al mapa de Google (URL):</label>
+                    <input type="url" id="mapa_url" name="mapa_url">
+                </div>
 
+                <div class="campo">
+                    <label for="foto_estacion">Foto:</label>
+                    <input type="file" id="foto_estacion" name="foto_estacion">
+                </div>
+
+                <div class="campo">
+                    <label for="contrasena">Password:</label>
+                    <input type="password" id="contrasena" name="contrasena">
+                </div>
             </div>
 
             <div id="sensores_config">
                 <h2>Selecciona los sensores</h2>
 
-                <input type="checkbox" id="sens_temp" name="sensor" value="temperatura">
-                <label for="sens_temp">Temperatura</label><br>
-
-                <input type="checkbox" id="sens_hum" name="sensor" value="humedad">
-                <label for="sens_hum">Humedad</label><br>
-
-                <input type="checkbox" id="sens_son" name="sensor" value="sonido">
-                <label for="sens_son">Sonido</label><br>
-
-                <input type="checkbox" id="sens_luz" name="sensor" value="luz">
-                <label for="sens_luz">Luz</label><br>
-
-                <input type="checkbox" id="sens_mov" name="sensor" value="movimiento">
-                <label for="sens_mov">Movimiento</label><br>
+                <div class="opcion">
+                    <input type="checkbox" id="sens_temp" name="sensor" value="temperatura">
+                    <label for="sens_temp">Temperatura</label>
+                </div>
+                <div class="opcion">
+                    <input type="checkbox" id="sens_hum" name="sensor" value="humedad">
+                    <label for="sens_hum">Humedad</label>
+                </div>
+                <div class="opcion">
+                    <input type="checkbox" id="sens_son" name="sensor" value="sonido">
+                    <label for="sens_son">Sonido</label>
+                </div>
+                <div class="opcion">
+                    <input type="checkbox" id="sens_luz" name="sensor" value="luz">
+                    <label for="sens_luz">Luz</label>
+                </div>
+                <div class="opcion">
+                    <input type="checkbox" id="sens_mov" name="sensor" value="movimiento">
+                    <label for="sens_mov">Movimiento</label>
+                </div>
 
                 <h3>Configure alertas</h3>
 
-                <label for="tmax">Temperatura maxima:</label>
-                <input type="number" name="temp_max" id="tmax" min="-20" max="45" step="1"><br><br>
-                
-                <label for="tmin">Temperatura minima:</label>
-                <input type="number" name="temp_min" id="tmin" min="-20" max="45" step="1"><br><br>
+                <div class="campo">
+                    <label for="tmax">Temperatura maxima:</label>
+                    <input type="number" name="temp_max" id="tmax" min="-20" max="45" step="1">
+                </div>
 
-                <label for="dif_temp">Diferencia de temperatura:</label>
-                <output id="dif_temp" name="diferencia_temp"></output><br><br>
-             </div>
+                <div class="campo">
+                    <label for="tmin">Temperatura minima:</label>
+                    <input type="number" name="temp_min" id="tmin" min="-20" max="45" step="1">
+                </div>
+
+                <div class="campo">
+                    <label for="dif_temp">Diferencia de temperatura:</label>
+                    <output id="dif_temp" name="diferencia_temp"></output>
+                </div>
+            </div>
+
             <input type="submit" value="Enviar datos">
         </form>
         <footer id="pie">
