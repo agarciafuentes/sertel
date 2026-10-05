@@ -82,8 +82,10 @@ ul {
 
 img {
   display: block;
-  max-width: 100%;          /* la imagen nunca se sale de su caja */
+  width: 100%;              /* ocupa el ancho de su caja, sin salirse */
   height: auto;
+  max-height: 360px;        /* y no crece mas de 360 px de alto */
+  object-fit: contain;      /* la foto se ve entera, sin deformarse ni recortarse */
   margin-top: 1rem;
   border-radius: 6px;
 }
@@ -310,8 +312,11 @@ input[type="file"] {
 }
 
 /* Si el valor no es valido (fuera de rango, URL mal escrita,
-   maxima menor que minima...), el campo se marca en rojo */
-input:invalid {
+   maxima menor que minima...), el campo se marca en rojo.
+   :not(:placeholder-shown) hace que solo ocurra cuando el campo tiene
+   algo escrito: asi un campo obligatorio vacio no sale en rojo nada mas
+   abrir la pagina. */
+input:invalid:not(:placeholder-shown) {
   border-color: var(--error);
   background-color: #FEF2F2;
 }
