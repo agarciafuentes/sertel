@@ -72,7 +72,7 @@ a {
 }
 
 a:hover {
-  text-decoration-thickness: 2px;
+  color: var(--titulo);
 }
 
 ul {
