@@ -123,17 +123,17 @@
             let max = parseInt(inputMax.value);
             let min = parseInt(inputMin.value);
 
-            if (!isNaN(max) && !isNaN(min)) {
-                if (max < min) {
-                    inputMax.setCustomValidity("La Tº maxima debe ser mayor o igual a la minima.");
-                    outputDif.value = "Error";
-                } else {
-                    inputMax.setCustomValidity("");
-                    let diferencia = max - min;
-                    outputDif.value = diferencia + " grados C";
-                }
+            inputMax.setCustomValidity("");
+
+            if (isNaN(max) || isNaN(min)) {
+                outputDif.value = "";
+            } else if (max < -20 || max > 45 || min < -20 || min > 45) {
+                outputDif.value = "Error: las temperaturas deben estar entre -20 y 45 grados C.";
+            } else if (max < min) {
+                inputMax.setCustomValidity("La Tº maxima debe ser mayor o igual a la minima.");
+                outputDif.value = "Error: la temperatura maxima debe ser mayor o igual que la minima.";
             } else {
-                inputMax.setCustomValidity("");
+                outputDif.value = (max - min) + " grados C";
             }
         }
 

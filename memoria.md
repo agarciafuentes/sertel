@@ -10,10 +10,14 @@ El enunciado pide comprobar que la temperatura máxima sea mayor o igual que la 
 
 **1. Restricciones HTML (nivel declarativo).** Los dos campos de alerta son `<input type="number">` con los atributos `min="-20"`, `max="45"` y `step="1"`. Con ellos, el navegador comprueba por sí solo, al enviar el formulario, que el valor sea numérico, esté entre −20 °C y 45 °C y sea un número entero. Estas restricciones no pueden comparar un campo con otro, y por eso hace falta el segundo nivel.
 
-**2. Comprobación en JavaScript (nivel dinámico).** Se ha implementado un script que escucha el evento `input` de ambos campos. En cada cambio lee los dos valores y, si ambos son números:
+**2. Comprobación en JavaScript (nivel dinámico).** Se ha implementado un script que escucha el evento `input` de ambos campos. En cada cambio limpia el mensaje de validez anterior con `setCustomValidity("")`, lee los dos valores y actúa según el caso:
 
-- Si el máximo es inferior al mínimo, se ejecuta `inputMax.setCustomValidity("La Tº maxima debe ser mayor o igual a la minima.")` y el elemento `<output>` muestra «Error». Con un mensaje de validez personalizado, el campo pasa a ser inválido: el navegador bloquea el envío del formulario y muestra ese texto como aviso nativo, y la hoja de estilos marca el campo en rojo.
-- Si los valores son correctos, el mensaje se limpia con `setCustomValidity("")` y el `<output>` muestra la diferencia entre ambas temperaturas (por ejemplo, «15 grados C»).
+- **Falta alguno de los dos valores:** el resultado se vacía.
+- **Alguno está fuera del rango de −20 °C a 45 °C:** el elemento `<output>` muestra el mensaje «Error: las temperaturas deben estar entre -20 y 45 grados C.». Además, el navegador marca el campo como inválido por los atributos `min` y `max`, y la hoja de estilos lo pinta en rojo.
+- **El máximo es inferior al mínimo:** se ejecuta `inputMax.setCustomValidity("La Tº maxima debe ser mayor o igual a la minima.")` y el `<output>` muestra «Error: la temperatura maxima debe ser mayor o igual que la minima.». Con un mensaje de validez personalizado, el campo pasa a ser inválido: el navegador bloquea el envío del formulario y muestra ese texto como aviso nativo, y la hoja de estilos marca el campo en rojo.
+- **Los valores son correctos:** el `<output>` muestra la diferencia entre ambas temperaturas (por ejemplo, «15 grados C»).
+
+De este modo, el usuario ve un mensaje comprensible en pantalla en cuanto introduce un valor no válido, sin esperar a pulsar el botón de enviar.
 
 *Nota:* se trata de una validación en el lado del cliente, orientada a mejorar la experiencia de usuario. Por seguridad, siempre debe complementarse con una validación en el servidor.
 
