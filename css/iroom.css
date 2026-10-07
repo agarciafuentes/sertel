@@ -23,6 +23,40 @@
   --borde-campo:  #64748B;   /* borde de los campos del formulario */
   --error:        #B91C1C;   /* campos con un valor no valido */
   --foco:         #FFD54A;   /* anillo de foco al navegar con teclado */
+  --subtitulo:    #3B6262;   /* color de los subtitulos h2 */
+  --enlace-hover: #1E293B;   /* enlaces al pasar el raton por encima */
+  --campo-fondo:  #FFFFFF;   /* fondo de los campos del formulario */
+  --cabecera-tabla: #E2E8F0; /* fondo de la fila de titulos de la tabla */
+  --salida-fondo: #E2E8F0;   /* fondo del resultado de la diferencia */
+  --error-fondo:  #FEF2F2;   /* fondo de un campo con valor no valido */
+}
+
+
+/* ---------- 1b. Modo oscuro (Apartado 8) ----------
+   Si el sistema operativo o el navegador del usuario estan en modo
+   oscuro, se redefinen las MISMAS variables con colores oscuros.
+   Como todo el CSS usa var(...), no hace falta tocar ninguna otra regla. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo-pagina: #0B1220;
+    --marco:        #1E293B;
+    --titulo:       #0F172A;
+    --barra:        #3B6262;
+    --pie:          #274545;
+    --tarjeta:      #273449;
+    --texto:        #E2E8F0;
+    --texto-claro:  #FFFFFF;
+    --enlace:       #93C5FD;
+    --borde:        #475569;
+    --borde-campo:  #94A3B8;
+    --error:        #FCA5A5;
+    --subtitulo:    #7FB5B5;
+    --enlace-hover: #FFFFFF;
+    --campo-fondo:  #0F172A;
+    --cabecera-tabla: #334155;
+    --salida-fondo: #334155;
+    --error-fondo:  #450A0A;
+  }
 }
 
 
@@ -55,10 +89,10 @@ h1 {
 h2 {
   font-size: 1.4rem;
   font-weight: 600;
-  color: var(--barra);
+  color: var(--subtitulo);
   margin: 0 0 0.75rem;
   padding-bottom: 0.4rem;
-  border-bottom: 2px solid var(--barra);
+  border-bottom: 2px solid var(--subtitulo);
 }
 
 h3 {
@@ -72,7 +106,7 @@ a {
 }
 
 a:hover {
-  color: var(--titulo);
+  color: var(--enlace-hover);
 }
 
 ul {
@@ -241,7 +275,7 @@ td {
 }
 
 th {
-  background-color: #E2E8F0;
+  background-color: var(--cabecera-tabla);
   font-weight: 700;
 }
 
@@ -306,7 +340,7 @@ input[type="file"] {
   padding: 8px 10px;
   font: inherit;            /* mismo tipo y tamano de letra que el resto */
   color: var(--texto);
-  background-color: #FFFFFF;
+  background-color: var(--campo-fondo);
   border: 1px solid var(--borde-campo);
   border-radius: 4px;
 }
@@ -318,7 +352,7 @@ input[type="file"] {
    abrir la pagina. */
 input:invalid:not(:placeholder-shown) {
   border-color: var(--error);
-  background-color: #FEF2F2;
+  background-color: var(--error-fondo);
 }
 
 /* Casillas de los sensores: casilla y texto en la misma linea */
@@ -345,7 +379,7 @@ output {
   display: block;
   min-height: 2.5rem;
   padding: 8px 10px;
-  background-color: #E2E8F0;
+  background-color: var(--salida-fondo);
   border-radius: 4px;
   font-weight: 700;
 }
@@ -374,5 +408,133 @@ input[type="submit"]:hover {
   #sensores_config,
   #datos_nombre {
     flex-basis: 100%;
+  }
+}
+
+
+/* =========================================================
+   7. MEJORAS EXTRA (Apartado 8)
+   ========================================================= */
+
+/* ---------- 7.1 Enlace "Saltar al contenido" ----------
+   Es el primer elemento al que llega la tecla Tab. Esta fuera de la
+   pantalla hasta que recibe el foco; entonces aparece arriba a la
+   izquierda. Permite a quien navega con teclado o lector de pantalla
+   saltarse el titulo y el menu. */
+.saltar {
+  position: absolute;
+  left: -9999px;
+  top: 10px;
+  padding: 10px 16px;
+  background-color: var(--texto-claro);
+  color: var(--titulo);
+  font-weight: 700;
+  border-radius: 4px;
+  z-index: 10;
+}
+
+.saltar:focus {
+  left: 10px;
+}
+
+/* ---------- 7.2 Vista previa de la foto (config.html) ---------- */
+#vista_previa img {
+  max-height: 200px;
+}
+
+/* ---------- 7.3 Transiciones y animacion ----------
+   Los cambios de color al pasar el raton ya no son bruscos: duran
+   0,25 s. Los botones suben 2 px en hover, y la pagina aparece con
+   un fundido suave al cargarse. */
+a,
+input[type="submit"],
+input[type="text"],
+input[type="url"],
+input[type="password"],
+input[type="number"] {
+  transition: background-color 0.25s ease, color 0.25s ease,
+              border-color 0.25s ease, transform 0.25s ease;
+}
+
+.boton-menu:hover,
+input[type="submit"]:hover {
+  transform: translateY(-2px);
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#contenedor {
+  animation: aparecer 0.5s ease-out;
+}
+
+/* Quien tiene activada la opcion "reducir movimiento" en su sistema
+   no ve animaciones ni transiciones. */
+@media (prefers-reduced-motion: reduce) {
+  #contenedor {
+    animation: none;
+  }
+
+  a,
+  input[type="submit"],
+  input[type="text"],
+  input[type="url"],
+  input[type="password"],
+  input[type="number"] {
+    transition: none;
+  }
+
+  .boton-menu:hover,
+  input[type="submit"]:hover {
+    transform: none;
+  }
+}
+
+/* ---------- 7.4 Estilos de impresion ----------
+   Al imprimir (o guardar como PDF) se quitan los colores de fondo,
+   el menu y el boton de enviar, y despues de cada enlace externo
+   se escribe su direccion, porque en papel no se puede hacer clic. */
+@media print {
+  body {
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 0;
+  }
+
+  #contenedor {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    background-color: #FFFFFF;
+  }
+
+  #titulo,
+  #pie {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1px solid #000000;
+  }
+
+  #menu,
+  #informacion,
+  .saltar,
+  input[type="submit"] {
+    display: none;
+  }
+
+  a {
+    color: #000000;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
   }
 }

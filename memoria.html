@@ -1,101 +1,279 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Memoria de Prácticas: Desarrollo Web</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 40px; }
-        h1 { color: #2A4747; border-bottom: 2px solid #2A4747; padding-bottom: 5px; }
-        h2 { color: #3A6363; margin-top: 30px; }
-        p { text-align: justify; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #f4f7f6; color: #2A4747; }
-        code { background-color: #f1f1f1; padding: 2px 4px; border-radius: 4px; font-family: monospace; }
-        .capturas { margin-top: 40px; }
-        .captura { margin-bottom: 30px; }
-        img { max-width: 100%; border: 1px solid #ccc; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memoria de Prácticas: Desarrollo Web (HTML5 y CSS3)</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;max-width:1000px;margin:0 auto;padding:1.5rem;line-height:1.55;color:#1f2d3a}
+h1,h2,h3{color:#2f5d62}
+h1{border-bottom:2px solid #2f5d62;padding-bottom:.4rem}
+table{border-collapse:collapse;width:100%;margin:1rem 0;display:block;overflow-x:auto}
+th,td{border:1px solid #cfd8dc;padding:.5rem;text-align:left;vertical-align:top}
+th{background:#eef3f3}
+code{background:#eef1f3;padding:.1rem .3rem;border-radius:3px}
+pre{background:#eef1f3;padding:1rem;overflow-x:auto;border-radius:4px}
+pre code{background:none;padding:0}
+img{max-width:100%;height:auto;border:1px solid #cfd8dc;margin:.4rem 0}
+
+@media print{
+body{max-width:none;padding:0;font-size:11pt}
+table{display:table;table-layout:fixed;width:100%;font-size:9pt}
+th,td{word-wrap:break-word;overflow-wrap:anywhere}
+pre{white-space:pre-wrap;word-wrap:break-word}
+img{max-width:100%;page-break-inside:avoid}
+h2,h3{page-break-after:avoid}
+tr{page-break-inside:avoid}
+}
+@page{margin:15mm}
+</style>
 </head>
 <body>
-    <h1>Memoria de Prácticas: Desarrollo Web (HTML5 y CSS3)</h1>
+<h1>Memoria de Prácticas: Desarrollo Web (HTML5 y CSS3)</h1>
+<p>Práctica P1 – Smart Room · Servicios Telemáticos · Universidad de Alcalá</p>
+<hr />
+<h2>Apartado 2: Validación de la temperatura</h2>
+<p>El enunciado pide comprobar que la temperatura máxima sea mayor o igual que la mínima combinando restricciones HTML con una comprobación en JavaScript. La solución tiene dos niveles que se complementan.</p>
+<p><strong>1. Restricciones HTML (nivel declarativo).</strong> Los dos campos de alerta son <code>&lt;input type="number"&gt;</code> con los atributos <code>min="-20"</code>, <code>max="45"</code> y <code>step="1"</code>. Con ellos, el navegador comprueba por sí solo, al enviar el formulario, que el valor sea numérico, esté entre −20 °C y 45 °C y sea un número entero. Estas restricciones no pueden comparar un campo con otro, y por eso hace falta el segundo nivel.</p>
+<p><strong>2. Comprobación en JavaScript (nivel dinámico).</strong> Se ha implementado un script que escucha el evento <code>input</code> de ambos campos. En cada cambio limpia el mensaje de validez anterior con <code>setCustomValidity("")</code>, lee los dos valores y actúa según el caso:</p>
+<ul>
+<li><strong>Falta alguno de los dos valores:</strong> el resultado se vacía.</li>
+<li><strong>Alguno está fuera del rango de −20 °C a 45 °C:</strong> el elemento <code>&lt;output&gt;</code> muestra el mensaje «Error: las temperaturas deben estar entre -20 y 45 grados C.». Además, el navegador marca el campo como inválido por los atributos <code>min</code> y <code>max</code>, y la hoja de estilos lo pinta en rojo.</li>
+<li><strong>El máximo es inferior al mínimo:</strong> se ejecuta <code>inputMax.setCustomValidity("La Tº maxima debe ser mayor o igual a la minima.")</code> y el <code>&lt;output&gt;</code> muestra «Error: la temperatura maxima debe ser mayor o igual que la minima.». Con un mensaje de validez personalizado, el campo pasa a ser inválido: el navegador bloquea el envío del formulario y muestra ese texto como aviso nativo, y la hoja de estilos marca el campo en rojo.</li>
+<li><strong>Los valores son correctos:</strong> el <code>&lt;output&gt;</code> muestra la diferencia entre ambas temperaturas (por ejemplo, «15 grados C»).</li>
+</ul>
+<p>De este modo, el usuario ve un mensaje comprensible en pantalla en cuanto introduce un valor no válido, sin esperar a pulsar el botón de enviar.</p>
+<p><em>Nota:</em> se trata de una validación en el lado del cliente, orientada a mejorar la experiencia de usuario. Por seguridad, siempre debe complementarse con una validación en el servidor.</p>
+<hr />
+<h2>Apartado 4: Control de caché (cabeceras HTTP)</h2>
+<h3>4.1 Diferencia entre <code>no-cache</code> y <code>no-store</code></h3>
+<ul>
+<li><strong><code>no-cache</code></strong>: el navegador <strong>puede almacenar</strong> el recurso en su caché local, pero está obligado a validarlo con el servidor antes de usarlo (mediante validadores como <code>ETag</code> o <code>Last-Modified</code>). Si el archivo no ha cambiado, el servidor responde <code>304 Not Modified</code> sin enviar el contenido y el navegador usa su copia; si ha cambiado, responde <code>200</code> con el contenido nuevo.</li>
+<li><strong><code>no-store</code></strong>: es la directiva más restrictiva. Prohíbe al navegador y a cualquier caché intermedia <strong>guardar</strong> el recurso en ningún momento. Es útil para páginas que manejan datos confidenciales (por ejemplo, información bancaria).</li>
+</ul>
+<p>En resumen: <code>no-cache</code> significa «guárdalo, pero pregunta antes de usarlo», y <code>no-store</code> significa «no lo guardes».</p>
+<h3>4.2 Política elegida para el documento HTML principal</h3>
+<p>Para <code>index.html</code> se elige <code>Cache-Control: no-cache</code>. Es el punto de entrada de la aplicación y su contenido cambia cada vez que se actualiza la web, además de ser el documento que enlaza la hoja de estilos y los scripts. Si se almacenara durante mucho tiempo, los usuarios seguirían viendo una versión antigua. Con <code>no-cache</code> el navegador comprueba en cada visita si ha cambiado y, si no es así, recibe una respuesta <code>304</code> muy ligera. No es necesario <code>no-store</code>, porque la página no contiene información confidencial.</p>
+<h3>4.3 Configuración en Apache</h3>
+<p>Se activa el módulo de cabeceras con <code>sudo a2enmod headers</code> y se añade lo siguiente al fichero del host virtual (<code>/etc/apache2/sites-available/iroom.conf</code>, cuyo directorio raíz es <code>/var/www/iroom</code>):</p>
+<pre><code class="language-apache">&lt;Directory /var/www/iroom&gt;
+    Require all granted
+    &lt;FilesMatch &quot;\.html$&quot;&gt;
+        Header set Cache-Control &quot;no-cache&quot;
+    &lt;/FilesMatch&gt;
+&lt;/Directory&gt;
+</code></pre>
+<p>Después se recarga la configuración con <code>sudo service apache2 reload</code>. La directiva solo afecta a los archivos <code>.html</code>; la hoja de estilos y la imagen conservan el comportamiento de caché por defecto.</p>
+<h3>4.4 Cabeceras observadas y comparación antes y después</h3>
+<p>Se ha cargado <code>http://192.168.37.131/index.html</code> con la pestaña <strong>Network</strong> de las herramientas de desarrollo de Microsoft Edge abierta, primero sin la directiva <code>Cache-Control</code> y después con ella. En cada caso se han probado tres acciones: navegar a la URL (Enter en la barra de direcciones), recarga normal (F5) y recarga forzada (Ctrl + F5).</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Situación</th>
+<th style="text-align: left;">Cabeceras de respuesta observadas</th>
+<th style="text-align: left;">Código HTTP</th>
+<th style="text-align: left;">Comportamiento observado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Antes · navegación</td>
+<td style="text-align: left;">Sin <code>Cache-Control</code>; con <code>ETag</code> y <code>Last-Modified</code></td>
+<td style="text-align: left;">200 (from disk cache)</td>
+<td style="text-align: left;">El navegador usa su copia local sin consultar al servidor: 0 B transferidos.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Antes · recarga normal</td>
+<td style="text-align: left;">Sin <code>Cache-Control</code>; con <code>ETag</code> y <code>Last-Modified</code></td>
+<td style="text-align: left;">200</td>
+<td style="text-align: left;">La petición lleva <code>Cache-Control: max-age=0</code>. Se transfieren 4,9 kB en total.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Antes · recarga forzada</td>
+<td style="text-align: left;">Sin <code>Cache-Control</code>; con <code>ETag</code> y <code>Last-Modified</code></td>
+<td style="text-align: left;">200</td>
+<td style="text-align: left;">La petición lleva <code>Cache-Control: no-cache</code>. Se descargan de nuevo todos los recursos (277 kB).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Después · navegación</td>
+<td style="text-align: left;"><code>Cache-Control: no-cache</code>; con <code>ETag</code> y <code>Last-Modified</code></td>
+<td style="text-align: left;">200</td>
+<td style="text-align: left;">El navegador ya no sirve el HTML desde la caché: lo pide al servidor (1,1 kB).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Después · recarga normal</td>
+<td style="text-align: left;"><code>Cache-Control: no-cache</code>; con <code>ETag</code> y <code>Last-Modified</code></td>
+<td style="text-align: left;">200</td>
+<td style="text-align: left;">La petición lleva <code>Cache-Control: max-age=0</code>. Se transfieren 1,1 kB.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Después · recarga forzada</td>
+<td style="text-align: left;">No visible en la captura (vista de lista)</td>
+<td style="text-align: left;">200</td>
+<td style="text-align: left;">Se descargan de nuevo todos los recursos (277 kB).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Conclusión.</strong> La diferencia importante está en la navegación normal. Antes de aplicar la configuración, el navegador servía <code>index.html</code> desde la caché del disco sin preguntar al servidor, de modo que el usuario podía ver una versión antigua. Con <code>Cache-Control: no-cache</code>, el navegador consulta al servidor en cada visita. En esa petición envía la cabecera <code>If-None-Match</code> con el valor del <code>ETag</code> recibido anteriormente (<code>"6a9-65d3dc8fe88dc-gzip"</code>), es decir, valida el documento antes de usarlo, tal como describe el apartado 4.1. Mientras tanto, <code>iroom.css</code> y <code>habitacion.jpg</code> se siguen sirviendo desde la caché de memoria (0 B), porque la directiva solo se aplica a los <code>.html</code>.</p>
+<p><em>Observación:</em> en las pruebas posteriores el servidor respondió <code>200</code> con el contenido (1,1 kB) y no <code>304 Not Modified</code>, aunque el documento no había cambiado. El ETag lleva el sufijo <code>-gzip</code> porque Apache comprime la respuesta, y es posible que esto influya en la comparación. No se ha investigado más; el comportamiento sigue cumpliendo el objetivo de que el navegador valide el documento en cada visita.</p>
+<p><em>Nota:</em> en las capturas de la recarga forzada aparece un <code>404</code> para <code>favicon.ico</code>. El navegador lo pide automáticamente cuando la página no declara icono. Se corrigió después añadiendo un favicon propio (Apartado 8).</p>
+<p><strong>Capturas (antes):</strong></p>
+<p><img alt="Antes · navegación" src="capturas/cache_antes_navegacion.png" />
+<img alt="Antes · recarga" src="capturas/cache_antes_recarga.png" />
+<img alt="Antes · recarga forzada" src="capturas/cache_antes_forzada.png" /></p>
+<p><strong>Capturas (después):</strong></p>
+<p><img alt="Después · navegación" src="capturas/cache_despues_navegacion.png" />
+<img alt="Después · recarga" src="capturas/cache_despues_recarga.png" />
+<img alt="Después · recarga forzada" src="capturas/cache_despues_forzada.png" /></p>
+<h3>4.5 Recursos estáticos versionados</h3>
+<p>Para archivos como hojas de estilo (<code>.css</code>), scripts o imágenes, usar <code>no-cache</code> es menos eficiente: obliga a consultar al servidor en cada uso, aunque casi nunca cambien. Lo ideal es darles una caducidad larga con <code>max-age</code> y, cuando el archivo se actualiza, <strong>cambiarle el nombre</strong> (por ejemplo, <code>iroom.v2.css</code>), de modo que el navegador lo trate como un recurso nuevo. Esto se conoce como versionado de recursos y permite una política como <code>Cache-Control: public, max-age=31536000, immutable</code>, que evita preguntar al servidor.</p>
+<p>En esta práctica los archivos no llevan versión en el nombre (<code>iroom.css</code>), por lo que una caducidad muy larga haría que los visitantes siguieran viendo estilos antiguos tras una actualización. Mientras no se versionen, conviene una caducidad corta o usar <code>no-cache</code>.</p>
+<hr />
+<h2>Apartado 6: Actualización mediante eventos enviados por el servidor (SSE) — Opcional</h2>
+<p>Para que los datos de los sensores se actualicen sin que el usuario recargue la página, se propone una arquitectura basada en <strong>Server-Sent Events (SSE)</strong>: el navegador abre una única conexión HTTP con el servidor y este va enviando por ella los datos nuevos. La comunicación es unidireccional (del servidor al cliente), que es justo lo que necesita un panel de sensores. Frente al <em>polling</em>, evita peticiones repetidas que a menudo no traen nada nuevo, y frente a WebSocket es más sencillo porque funciona sobre HTTP normal y el navegador se reconecta solo.</p>
+<p><strong>Arquitectura.</strong> El servidor expone un recurso (por ejemplo, <code>/api/sensores/stream</code>), atendido por un script del servidor (PHP, Python, Node...), porque un servidor de archivos estáticos no puede mantener la conexión abierta ni generar eventos. El script responde con las cabeceras:</p>
+<pre><code>Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+</code></pre>
+<p><strong>Formato de los mensajes <code>text/event-stream</code>.</strong> Es texto plano. Cada mensaje está formado por líneas del tipo <code>campo: valor</code> y termina con una <strong>línea en blanco</strong>. Los campos habituales son <code>data</code> (el contenido, obligatorio), <code>event</code> (nombre del evento; si no se indica, es <code>message</code>), <code>id</code> (identificador, que el navegador reenvía al reconectar) y <code>retry</code> (milisegundos de espera para reconectar). Las líneas que empiezan por <code>:</code> son comentarios.</p>
+<pre><code>event: sensores
+id: 42
+data: {&quot;temperatura&quot;: 22.5, &quot;humedad&quot;: 41}
 
-    <h2>Apartado 2: Validación de la Temperatura</h2>
-    <p>Para garantizar que la temperatura máxima introducida en el formulario sea mayor o igual que la mínima, se ha utilizado la API de validación nativa de HTML5 mediante JavaScript (<code>setCustomValidity()</code>).</p>
-    <p>Se ha implementado un script que, mediante el evento <code>input</code>, lee en tiempo real los valores de los campos de temperatura. Si el valor máximo es inferior al mínimo, se ejecuta <code>inputMax.setCustomValidity("La temperatura máxima debe ser mayor o igual a la mínima")</code>, bloqueando el envío del formulario y mostrando un aviso nativo del navegador. Si los valores son correctos, el mensaje se limpia y se calcula la diferencia en la etiqueta <code>&lt;output&gt;</code>.</p>
-    <p><em>Nota:</em> Esta es una validación del lado del cliente orientada a mejorar la experiencia de usuario (UX). Por seguridad, siempre debe complementarse con una validación en el lado del servidor.</p>
+</code></pre>
+<p><strong>Conexión desde el navegador con <code>EventSource</code>:</strong></p>
+<pre><code class="language-javascript">const fuente = new EventSource(&quot;/api/sensores/stream&quot;);
 
-    <h2>Apartado 4: Control de Caché (Cabeceras HTTP)</h2>
-    <p>Se ha procedido a analizar la gestión de la caché en los recursos de la web estudiando las cabeceras HTTP de respuesta:</p>
-    <ul>
-        <li><strong>no-cache</strong>: Esta directiva permite que el navegador almacene el recurso en su memoria caché local, pero le obliga a validar siempre con el servidor (mediante validadores como <code>ETag</code> o <code>Last-Modified</code>) si el archivo ha sufrido modificaciones. Si no ha cambiado, usa el guardado; si cambió, lo descarga de nuevo.</li>
-        <li><strong>no-store</strong>: Es la directiva más restrictiva. Prohíbe totalmente al navegador guardar el recurso en el disco duro o en caché bajo ninguna circunstancia. Es útil para páginas que manejan datos confidenciales o bancarios.</li>
-    </ul>
-    <p><strong>Justificación para recursos estáticos versionados:</strong> Para archivos como hojas de estilo (<code>.css</code>), imágenes o scripts, usar <code>no-cache</code> es menos eficiente. Lo ideal es utilizar un tiempo de caché largo (<code>max-age</code>) y, cuando se actualiza el archivo, cambiarle el nombre (ej. <code>estilo_v2.css</code>). Esto se conoce como "versionado de recursos" y evita tener que consultar al servidor constantemente si el archivo ha cambiado.</p>
+fuente.addEventListener(&quot;sensores&quot;, (evento) =&gt; {
+    const datos = JSON.parse(evento.data);
+    document.getElementById(&quot;valor-temperatura&quot;).textContent = datos.temperatura + &quot;ºC&quot;;
+});
 
-    <h2>Apartado 6: Actualización mediante eventos SSE (Opcional)</h2>
-    <p>Para lograr que los datos de los sensores de la habitación se actualicen automáticamente sin que el cliente tenga que recargar la página, se propone una arquitectura basada en <strong>Server-Sent Events (SSE)</strong>.</p>
-    <p>El servidor expondría un endpoint (por ejemplo, <code>/api/sensores/stream</code>) que devuelve cabeceras HTTP específicas (<code>Content-Type: text/event-stream</code>). Por su parte, el navegador web usaría el objeto JavaScript <code>EventSource</code> para conectarse a ese endpoint y mantener una conexión unidireccional abierta de forma permanente. Cada vez que el servidor detecta una nueva medida en un sensor, empuja un evento de texto al cliente y el JavaScript actualiza dinámicamente el DOM (la tabla de sensores) mediante manejadores como <code>onmessage</code>.</p>
-
-    <h2>Apartado 9: Validación y calidad del código</h2>
-    <p>Se han utilizado las herramientas oficiales del W3C para validar la sintaxis del código de la práctica. A continuación, se detalla la tabla con las herramientas utilizadas, los problemas encontrados y las correcciones aplicadas:</p>
-    
-    <table>
-        <tr>
-            <th>Herramienta</th>
-            <th>Archivo</th>
-            <th>Problema / Advertencia identificada</th>
-            <th>Solución aplicada</th>
-        </tr>
-        <tr>
-            <td><strong>W3C Nu Html Checker</strong></td>
-            <td><code>Index.html</code></td>
-            <td><em>Warning: Section lacks heading.</em> El estándar recomienda incluir elementos h2-h6 para identificar el contenido de las etiquetas <code>&lt;section&gt;</code>.</td>
-            <td>Se ha añadido un encabezado <code>&lt;h2&gt;</code> dentro de las secciones de "Datos de la habitación" y "Datos de los sensores" para aportar una jerarquía coherente.</td>
-        </tr>
-        <tr>
-            <td><strong>W3C Nu Html Checker</strong></td>
-            <td><code>config.html</code></td>
-            <td><em>Error: The heading h3 follows the heading h1, skipping 1 heading level.</em> Salto en la jerarquía de encabezados.</td>
-            <td>Se han reemplazado las sub-secciones que usaban <code>&lt;h3&gt;</code> por <code>&lt;h2&gt;</code> para mantener la progresión semántica lógica que requiere HTML5 tras el <code>&lt;h1&gt;</code> principal.</td>
-        </tr>
-        <tr>
-            <td><strong>W3C Nu Html Checker</strong></td>
-            <td><code>minombre.html</code></td>
-            <td><em>Warning: This document has heading elements but none of them has a computed heading level of 1.</em> Falta el encabezado principal de la página.</td>
-            <td>Se ha cambiado la etiqueta <code>&lt;h2&gt;</code> por un <code>&lt;h1&gt;</code> para cumplir con las reglas de accesibilidad que exigen un título principal por documento.</td>
-        </tr>
-    </table>
-
-    <div class="capturas">
-    <h2>Capturas de Validación</h2>
-    
-    <div class="captura">
-        <p><strong>Index.html (Advertencia original):</strong></p>
-        <img src="file:///C:/Users/mming/Desktop/SERTEL/Practica-web/capturas/val_index_warning.png" alt="Warning Index">
-    </div>
-    <div class="captura">
-        <p><strong>Index.html (Validación superada tras añadir h2):</strong></p>
-        <img src="file:///C:/Users/mming/Desktop/SERTEL/Practica-web/capturas/val_index_ok.png" alt="OK Index">
-    </div>
-    
-    <div class="captura">
-        <p><strong>config.html (Error original - Salto de cabecera):</strong></p>
-        <img src="file:///C:/Users/mming/Desktop/SERTEL/Practica-web/capturas/val_config_warning.png" alt="Warning Config">
-    </div>
-    <div class="captura">
-        <p><strong>config.html (Validación superada tras cambiar h3 a h2):</strong></p>
-        <img src="file:///C:/Users/mming/Desktop/SERTEL/Practica-web/capturas/val_config_ok.png" alt="OK Config">
-    </div>
-    
-    <div class="captura">
-        <p><strong>minombre.html (Advertencia original - Falta h1):</strong></p>
-        <img src="file:///C:/Users/mming/Desktop/SERTEL/Practica-web/capturas/val_minombre_warning.png" alt="Warning Minombre">
-    </div>
-    <div class="captura">
-        <p><strong>minombre.html (Validación superada tras cambiar h2 a h1):</strong></p>
-        <img src="file:///C:/Users/mming/Desktop/SERTEL/Practica-web/capturas/val_minombre_ok.png" alt="OK Minombre">
-    </div>
-</div>
+fuente.onerror = () =&gt; {
+    console.log(&quot;Conexión perdida; el navegador reintentará automáticamente.&quot;);
+};
+</code></pre>
+<p><strong>Procedimiento de actualización de la interfaz.</strong> Cada vez que el servidor detecta una medida nueva, escribe un mensaje en la conexión abierta. El navegador lo recibe, dispara el manejador del evento y el código JavaScript modifica el DOM: en este caso, el contenido de la celda de la tabla de sensores, a la que se le asignaría un <code>id</code> (por ejemplo, <code>valor-temperatura</code>). Si la conexión se cae, <code>EventSource</code> reintenta de forma automática y envía la cabecera <code>Last-Event-ID</code> para que el servidor pueda retomar desde el último evento recibido.</p>
+<hr />
+<h2>Apartado 8: Mejoras adicionales (opcional)</h2>
+<p>Se han añadido seis mejoras que no se pedían en los apartados anteriores. Todas están en los mismos archivos de la práctica (no hay librerías externas) y no han introducido errores en la validación del Apartado 9.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Mejora</th>
+<th style="text-align: left;">Dónde</th>
+<th style="text-align: left;">Qué hace y por qué</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Favicon propio</strong></td>
+<td style="text-align: left;"><code>images/favicon.svg</code> y <code>&lt;link rel="icon"&gt;</code> en las tres páginas</td>
+<td style="text-align: left;">Muestra un icono en la pestaña y evita la petición fallida a <code>/favicon.ico</code> (error 404) que aparecía en la pestaña Red. Es un SVG, así que pesa muy poco y se ve nítido a cualquier tamaño.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Modo oscuro automático</strong></td>
+<td style="text-align: left;"><code>iroom.css</code>, bloque <code>@media (prefers-color-scheme: dark)</code></td>
+<td style="text-align: left;">Si el sistema del usuario está en modo oscuro, la web usa una paleta oscura. Como todos los colores del CSS son variables (<code>var(--...)</code>), solo se redefinen las variables en <code>:root</code>, sin tocar el resto de reglas. Se comprobó el contraste de texto, enlaces y campos.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Enlace "Saltar al contenido"</strong></td>
+<td style="text-align: left;"><code>&lt;a class="saltar"&gt;</code> en las tres páginas y reglas <code>.saltar</code></td>
+<td style="text-align: left;">Es el primer elemento al que llega la tecla Tab y solo se ve al recibir el foco. Permite a quien navega con teclado o con lector de pantalla saltarse el título y el menú. Complementa el foco visible que pide el Apartado 1.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Transiciones y animación CSS</strong></td>
+<td style="text-align: left;"><code>iroom.css</code>, <code>transition</code>, <code>transform</code> y <code>@keyframes aparecer</code></td>
+<td style="text-align: left;">Los cambios de color de enlaces, botones y campos duran 0,25 s en vez de ser bruscos, los botones suben 2 px al pasar el ratón y la página aparece con un fundido al cargar. Con <code>prefers-reduced-motion: reduce</code> todo esto se desactiva, por accesibilidad.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Vista previa de la foto</strong></td>
+<td style="text-align: left;"><code>config.html</code>, script del final</td>
+<td style="text-align: left;">Al elegir un archivo en el campo «Foto», el evento <code>change</code> crea un elemento <code>&lt;img&gt;</code> con <code>URL.createObjectURL</code>, de modo que se ve la imagen antes de enviar el formulario. Solo muestra archivos de tipo imagen y la imagen lleva atributo <code>alt</code>. Además, el campo usa <code>accept="image/*"</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Estilos de impresión</strong></td>
+<td style="text-align: left;"><code>iroom.css</code>, bloque <code>@media print</code></td>
+<td style="text-align: left;">Al imprimir o guardar como PDF se quitan los fondos, el menú, la zona de información y el botón de enviar, y tras cada enlace externo se escribe su dirección, porque en papel no se puede hacer clic.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variables nuevas.</strong> Para que el modo oscuro funcione sin duplicar reglas, los colores que antes estaban escritos directamente en algunas reglas (fondo de los campos, de la cabecera de la tabla, del resultado, de los campos no válidos, color de los subtítulos y del hover de los enlaces) pasaron a variables: <code>--campo-fondo</code>, <code>--cabecera-tabla</code>, <code>--salida-fondo</code>, <code>--error-fondo</code>, <code>--subtitulo</code> y <code>--enlace-hover</code>. En modo claro tienen los mismos valores de antes, así que el aspecto no cambia.</p>
+<hr />
+<h2>Apartado 9: Validación y calidad del código</h2>
+<p>Se han utilizado las herramientas oficiales del W3C para validar el HTML (W3C Nu Html Checker, en <code>validator.w3.org</code>) y la hoja de estilos (W3C CSS Validation Service, en <code>jigsaw.w3.org/css-validator</code>), y la consola de las herramientas de desarrollo del navegador para comprobar que no aparecen errores. La siguiente tabla recoge las herramientas utilizadas, los problemas identificados y las correcciones aplicadas.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Herramienta</th>
+<th style="text-align: left;">Archivo</th>
+<th style="text-align: left;">Resultado / problema identificado</th>
+<th style="text-align: left;">Corrección aplicada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>W3C Nu Html Checker</strong></td>
+<td style="text-align: left;">index.html (versión original)</td>
+<td style="text-align: left;">Dos avisos: <em>Warning: Section lacks heading</em> en <code>&lt;section id="habitacion"&gt;</code> (línea 18) y en <code>&lt;section id="sensores"&gt;</code> (línea 26). El estándar recomienda identificar con un encabezado <code>h2</code>–<code>h6</code> el contenido de cada <code>&lt;section&gt;</code>.</td>
+<td style="text-align: left;">Se añadió un <code>&lt;h2&gt;</code> en las secciones «Datos de la habitación» y «Datos de los sensores».</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>W3C Nu Html Checker</strong></td>
+<td style="text-align: left;">index.html (versión final)</td>
+<td style="text-align: left;">Sin errores ni avisos.</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>W3C Nu Html Checker</strong></td>
+<td style="text-align: left;">config.html (versión final)</td>
+<td style="text-align: left;">Sin errores ni avisos.</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>W3C Nu Html Checker</strong></td>
+<td style="text-align: left;">minombre.html (versión final)</td>
+<td style="text-align: left;">Sin errores ni avisos.</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>W3C Nu Html Checker</strong> (comprobador de CSS integrado)</td>
+<td style="text-align: left;">css/iroom.css (versión anterior)</td>
+<td style="text-align: left;">Rechazó la propiedad <code>text-decoration-thickness</code> en la regla <code>a:hover</code> (línea 75), aunque el W3C CSS Validation Service la daba por válida. Cada herramienta usa su propio motor de CSS y no aceptan exactamente las mismas propiedades.</td>
+<td style="text-align: left;">Se sustituyó por un cambio de color en el estado hover: <code>a:hover { color: var(--enlace-hover); }</code>, una variable de color definida al principio del CSS. Así el archivo pasa en las dos herramientas.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>W3C CSS Validation Service</strong></td>
+<td style="text-align: left;">css/iroom.css (versión final)</td>
+<td style="text-align: left;">Sin errores (CSS nivel 3 + SVG).</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Consola de Microsoft Edge (DevTools)</strong></td>
+<td style="text-align: left;">index.html</td>
+<td style="text-align: left;">Al abrir la página como archivo local aparecía el mensaje <em>«Unsafe attempt to load URL file:///... from frame with URL file:///...»</em>.</td>
+<td style="text-align: left;">El mensaje desaparece al abrir la página en una ventana InPrivate, sin extensiones, por lo que no procede del código de la práctica. Con ese método, las consolas de las tres páginas aparecen sin errores («No issues»).</td>
+</tr>
+</tbody>
+</table>
+<h3>Capturas de validación</h3>
+<p><strong>index.html (avisos originales):</strong>
+<img alt="Avisos en index.html" src="capturas/val_index_warning.jpg" /></p>
+<p><strong>index.html (validación final):</strong>
+<img alt="Validación de index.html" src="capturas/validacion_index_html.png" /></p>
+<p><strong>config.html (validación final):</strong>
+<img alt="Validación de config.html" src="capturas/validacion_config_html.png" /></p>
+<p><strong>minombre.html (validación final):</strong>
+<img alt="Validación de minombre.html" src="capturas/validacion_minombre_html.png" /></p>
+<p><strong>iroom.css (validación final):</strong>
+<img alt="Validación de iroom.css" src="capturas/validacion_css.png" /></p>
+<h3>Capturas de la consola del navegador</h3>
+<p><strong>index.html:</strong>
+<img alt="Consola de index.html" src="capturas/consola_index.png" /></p>
+<p><strong>config.html:</strong>
+<img alt="Consola de config.html" src="capturas/consola_config.png" /></p>
+<p><strong>minombre.html:</strong>
+<img alt="Consola de minombre.html" src="capturas/consola_minombre.png" /></p>
 </body>
 </html>

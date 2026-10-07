@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Configuracion - Smart Room</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <link rel="stylesheet" type="text/css" href="css/iroom.css">
 </head>
 <body>
+    <a class="saltar" href="#datos_estacion">Saltar al formulario</a>
     <main id="contenedor">
         <header id="titulo">
             <h1>Configuracion de la habitacion</h1>
@@ -57,7 +59,8 @@
 
                 <div class="campo">
                     <label for="foto_estacion">Foto:</label>
-                    <input type="file" id="foto_estacion" name="foto_estacion">
+                    <input type="file" id="foto_estacion" name="foto_estacion" accept="image/*">
+                    <div id="vista_previa"></div>
                 </div>
 
                 <div class="campo">
@@ -139,6 +142,24 @@
 
         inputMax.addEventListener("input", calcularYValidar);
         inputMin.addEventListener("input", calcularYValidar);
+
+        // Vista previa de la foto elegida, antes de enviar el formulario
+        const inputFoto = document.getElementById("foto_estacion");
+        const zonaVista = document.getElementById("vista_previa");
+
+        inputFoto.addEventListener("change", function () {
+            zonaVista.innerHTML = "";
+            const archivo = inputFoto.files[0];
+            if (archivo && archivo.type.startsWith("image/")) {
+                const imagen = document.createElement("img");
+                imagen.src = URL.createObjectURL(archivo);
+                imagen.alt = "Vista previa de la foto seleccionada";
+                imagen.onload = function () {
+                    URL.revokeObjectURL(imagen.src);
+                };
+                zonaVista.appendChild(imagen);
+            }
+        });
     </script>
 <script src="datos.js"></script>
 </body>

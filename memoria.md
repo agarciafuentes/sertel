@@ -68,7 +68,7 @@ Se ha cargado `http://192.168.37.131/index.html` con la pestaña **Network** de 
 
 *Observación:* en las pruebas posteriores el servidor respondió `200` con el contenido (1,1 kB) y no `304 Not Modified`, aunque el documento no había cambiado. El ETag lleva el sufijo `-gzip` porque Apache comprime la respuesta, y es posible que esto influya en la comparación. No se ha investigado más; el comportamiento sigue cumpliendo el objetivo de que el navegador valide el documento en cada visita.
 
-*Nota:* en las capturas de la recarga forzada aparece un `404` para `favicon.ico`. El navegador lo pide automáticamente y no forma parte de la práctica.
+*Nota:* en las capturas de la recarga forzada aparece un `404` para `favicon.ico`. El navegador lo pide automáticamente cuando la página no declara icono. Se corrigió después añadiendo un favicon propio (Apartado 8).
 
 **Capturas (antes):**
 
@@ -130,6 +130,23 @@ fuente.onerror = () => {
 
 ---
 
+## Apartado 8: Mejoras adicionales (opcional)
+
+Se han añadido seis mejoras que no se pedían en los apartados anteriores. Todas están en los mismos archivos de la práctica (no hay librerías externas) y no han introducido errores en la validación del Apartado 9.
+
+| Mejora | Dónde | Qué hace y por qué |
+| :--- | :--- | :--- |
+| **Favicon propio** | `images/favicon.svg` y `<link rel="icon">` en las tres páginas | Muestra un icono en la pestaña y evita la petición fallida a `/favicon.ico` (error 404) que aparecía en la pestaña Red. Es un SVG, así que pesa muy poco y se ve nítido a cualquier tamaño. |
+| **Modo oscuro automático** | `iroom.css`, bloque `@media (prefers-color-scheme: dark)` | Si el sistema del usuario está en modo oscuro, la web usa una paleta oscura. Como todos los colores del CSS son variables (`var(--...)`), solo se redefinen las variables en `:root`, sin tocar el resto de reglas. Se comprobó el contraste de texto, enlaces y campos. |
+| **Enlace "Saltar al contenido"** | `<a class="saltar">` en las tres páginas y reglas `.saltar` | Es el primer elemento al que llega la tecla Tab y solo se ve al recibir el foco. Permite a quien navega con teclado o con lector de pantalla saltarse el título y el menú. Complementa el foco visible que pide el Apartado 1. |
+| **Transiciones y animación CSS** | `iroom.css`, `transition`, `transform` y `@keyframes aparecer` | Los cambios de color de enlaces, botones y campos duran 0,25 s en vez de ser bruscos, los botones suben 2 px al pasar el ratón y la página aparece con un fundido al cargar. Con `prefers-reduced-motion: reduce` todo esto se desactiva, por accesibilidad. |
+| **Vista previa de la foto** | `config.html`, script del final | Al elegir un archivo en el campo «Foto», el evento `change` crea un elemento `<img>` con `URL.createObjectURL`, de modo que se ve la imagen antes de enviar el formulario. Solo muestra archivos de tipo imagen y la imagen lleva atributo `alt`. Además, el campo usa `accept="image/*"`. |
+| **Estilos de impresión** | `iroom.css`, bloque `@media print` | Al imprimir o guardar como PDF se quitan los fondos, el menú, la zona de información y el botón de enviar, y tras cada enlace externo se escribe su dirección, porque en papel no se puede hacer clic. |
+
+**Variables nuevas.** Para que el modo oscuro funcione sin duplicar reglas, los colores que antes estaban escritos directamente en algunas reglas (fondo de los campos, de la cabecera de la tabla, del resultado, de los campos no válidos, color de los subtítulos y del hover de los enlaces) pasaron a variables: `--campo-fondo`, `--cabecera-tabla`, `--salida-fondo`, `--error-fondo`, `--subtitulo` y `--enlace-hover`. En modo claro tienen los mismos valores de antes, así que el aspecto no cambia.
+
+---
+
 ## Apartado 9: Validación y calidad del código
 
 Se han utilizado las herramientas oficiales del W3C para validar el HTML (W3C Nu Html Checker, en `validator.w3.org`) y la hoja de estilos (W3C CSS Validation Service, en `jigsaw.w3.org/css-validator`), y la consola de las herramientas de desarrollo del navegador para comprobar que no aparecen errores. La siguiente tabla recoge las herramientas utilizadas, los problemas identificados y las correcciones aplicadas.
@@ -140,7 +157,7 @@ Se han utilizado las herramientas oficiales del W3C para validar el HTML (W3C Nu
 | **W3C Nu Html Checker** | index.html (versión final) | Sin errores ni avisos. | — |
 | **W3C Nu Html Checker** | config.html (versión final) | Sin errores ni avisos. | — |
 | **W3C Nu Html Checker** | minombre.html (versión final) | Sin errores ni avisos. | — |
-| **W3C Nu Html Checker** (comprobador de CSS integrado) | css/iroom.css (versión anterior) | Rechazó la propiedad `text-decoration-thickness` en la regla `a:hover` (línea 75), aunque el W3C CSS Validation Service la daba por válida. Cada herramienta usa su propio motor de CSS y no aceptan exactamente las mismas propiedades. | Se sustituyó por un cambio de color en el estado hover: `a:hover { color: var(--titulo); }`. Así el archivo pasa en las dos herramientas. |
+| **W3C Nu Html Checker** (comprobador de CSS integrado) | css/iroom.css (versión anterior) | Rechazó la propiedad `text-decoration-thickness` en la regla `a:hover` (línea 75), aunque el W3C CSS Validation Service la daba por válida. Cada herramienta usa su propio motor de CSS y no aceptan exactamente las mismas propiedades. | Se sustituyó por un cambio de color en el estado hover: `a:hover { color: var(--enlace-hover); }`, una variable de color definida al principio del CSS. Así el archivo pasa en las dos herramientas. |
 | **W3C CSS Validation Service** | css/iroom.css (versión final) | Sin errores (CSS nivel 3 + SVG). | — |
 | **Consola de Microsoft Edge (DevTools)** | index.html | Al abrir la página como archivo local aparecía el mensaje *«Unsafe attempt to load URL file:///... from frame with URL file:///...»*. | El mensaje desaparece al abrir la página en una ventana InPrivate, sin extensiones, por lo que no procede del código de la práctica. Con ese método, las consolas de las tres páginas aparecen sin errores («No issues»). |
 
