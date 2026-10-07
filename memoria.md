@@ -38,9 +38,7 @@ Para `index.html` se elige `Cache-Control: no-cache`. Es el punto de entrada de 
 
 ### 4.3 Configuración en Apache
 
-> **PENDIENTE:** aplicar esta configuración en el servidor del Apartado 7 y comprobar que funciona antes de dar este apartado por cerrado.
-
-Se activa el módulo de cabeceras con `sudo a2enmod headers` y se añade lo siguiente al fichero del host virtual:
+Se activa el módulo de cabeceras con `sudo a2enmod headers` y se añade lo siguiente al fichero del host virtual (`/etc/apache2/sites-available/iroom.conf`, cuyo directorio raíz es `/var/www/iroom`):
 
 ```apache
 <Directory /var/www/iroom>
@@ -51,18 +49,38 @@ Se activa el módulo de cabeceras con `sudo a2enmod headers` y se añade lo sigu
 </Directory>
 ```
 
-Después se recarga la configuración con `sudo service apache2 reload`.
+Después se recarga la configuración con `sudo service apache2 reload`. La directiva solo afecta a los archivos `.html`; la hoja de estilos y la imagen conservan el comportamiento de caché por defecto.
 
 ### 4.4 Cabeceras observadas y comparación antes y después
 
-> **PENDIENTE:** rellenar con lo observado en la pestaña **Red** de las herramientas de desarrollo del navegador, antes y después de aplicar la configuración. Incluir las capturas en la carpeta `capturas`.
+Se ha cargado `http://192.168.37.131/index.html` con la pestaña **Network** de las herramientas de desarrollo de Microsoft Edge abierta, primero sin la directiva `Cache-Control` y después con ella. En cada caso se han probado tres acciones: navegar a la URL (Enter en la barra de direcciones), recarga normal (F5) y recarga forzada (Ctrl + F5).
 
 | Situación | Cabeceras de respuesta observadas | Código HTTP | Comportamiento observado |
 | :--- | :--- | :--- | :--- |
-| Antes · recarga normal | *(completar)* | *(completar)* | *(completar)* |
-| Antes · recarga forzada | *(completar)* | *(completar)* | *(completar)* |
-| Después · recarga normal | *(completar)* | *(completar)* | *(completar)* |
-| Después · recarga forzada | *(completar)* | *(completar)* | *(completar)* |
+| Antes · navegación | Sin `Cache-Control`; con `ETag` y `Last-Modified` | 200 (from disk cache) | El navegador usa su copia local sin consultar al servidor: 0 B transferidos. |
+| Antes · recarga normal | Sin `Cache-Control`; con `ETag` y `Last-Modified` | 200 | La petición lleva `Cache-Control: max-age=0`. Se transfieren 4,9 kB en total. |
+| Antes · recarga forzada | Sin `Cache-Control`; con `ETag` y `Last-Modified` | 200 | La petición lleva `Cache-Control: no-cache`. Se descargan de nuevo todos los recursos (277 kB). |
+| Después · navegación | `Cache-Control: no-cache`; con `ETag` y `Last-Modified` | 200 | El navegador ya no sirve el HTML desde la caché: lo pide al servidor (1,1 kB). |
+| Después · recarga normal | `Cache-Control: no-cache`; con `ETag` y `Last-Modified` | 200 | La petición lleva `Cache-Control: max-age=0`. Se transfieren 1,1 kB. |
+| Después · recarga forzada | No visible en la captura (vista de lista) | 200 | Se descargan de nuevo todos los recursos (277 kB). |
+
+**Conclusión.** La diferencia importante está en la navegación normal. Antes de aplicar la configuración, el navegador servía `index.html` desde la caché del disco sin preguntar al servidor, de modo que el usuario podía ver una versión antigua. Con `Cache-Control: no-cache`, el navegador consulta al servidor en cada visita. En esa petición envía la cabecera `If-None-Match` con el valor del `ETag` recibido anteriormente (`"6a9-65d3dc8fe88dc-gzip"`), es decir, valida el documento antes de usarlo, tal como describe el apartado 4.1. Mientras tanto, `iroom.css` y `habitacion.jpg` se siguen sirviendo desde la caché de memoria (0 B), porque la directiva solo se aplica a los `.html`.
+
+*Observación:* en las pruebas posteriores el servidor respondió `200` con el contenido (1,1 kB) y no `304 Not Modified`, aunque el documento no había cambiado. El ETag lleva el sufijo `-gzip` porque Apache comprime la respuesta, y es posible que esto influya en la comparación. No se ha investigado más; el comportamiento sigue cumpliendo el objetivo de que el navegador valide el documento en cada visita.
+
+*Nota:* en las capturas de la recarga forzada aparece un `404` para `favicon.ico`. El navegador lo pide automáticamente y no forma parte de la práctica.
+
+**Capturas (antes):**
+
+![Antes · navegación](capturas/cache_antes_navegacion.png)
+![Antes · recarga](capturas/cache_antes_recarga.png)
+![Antes · recarga forzada](capturas/cache_antes_forzada.png)
+
+**Capturas (después):**
+
+![Después · navegación](capturas/cache_despues_navegacion.png)
+![Después · recarga](capturas/cache_despues_recarga.png)
+![Después · recarga forzada](capturas/cache_despues_forzada.png)
 
 ### 4.5 Recursos estáticos versionados
 
@@ -122,6 +140,7 @@ Se han utilizado las herramientas oficiales del W3C para validar el HTML (W3C Nu
 | **W3C Nu Html Checker** | index.html (versión final) | Sin errores ni avisos. | — |
 | **W3C Nu Html Checker** | config.html (versión final) | Sin errores ni avisos. | — |
 | **W3C Nu Html Checker** | minombre.html (versión final) | Sin errores ni avisos. | — |
+| **W3C Nu Html Checker** (comprobador de CSS integrado) | css/iroom.css (versión anterior) | Rechazó la propiedad `text-decoration-thickness` en la regla `a:hover` (línea 75), aunque el W3C CSS Validation Service la daba por válida. Cada herramienta usa su propio motor de CSS y no aceptan exactamente las mismas propiedades. | Se sustituyó por un cambio de color en el estado hover: `a:hover { color: var(--titulo); }`. Así el archivo pasa en las dos herramientas. |
 | **W3C CSS Validation Service** | css/iroom.css (versión final) | Sin errores (CSS nivel 3 + SVG). | — |
 | **Consola de Microsoft Edge (DevTools)** | index.html | Al abrir la página como archivo local aparecía el mensaje *«Unsafe attempt to load URL file:///... from frame with URL file:///...»*. | El mensaje desaparece al abrir la página en una ventana InPrivate, sin extensiones, por lo que no procede del código de la práctica. Con ese método, las consolas de las tres páginas aparecen sin errores («No issues»). |
 
