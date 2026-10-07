@@ -245,6 +245,12 @@ fuente.onerror = () =&gt; {
 </tr>
 <tr>
 <td style="text-align: left;"><strong>W3C CSS Validation Service</strong></td>
+<td style="text-align: left;">css/iroom.css (tras añadir las mejoras del Apartado 8)</td>
+<td style="text-align: left;">Una advertencia (no un error): la propiedad <code>animation</code> no existe en el medio <code>print</code> (línea 517). Venía de <code>animation: none;</code> dentro de <code>@media print</code>.</td>
+<td style="text-align: left;">Se quitó esa línea, porque en papel no hay animación que desactivar. Tras el cambio, el validador indica «No error encontrado» y ya no muestra advertencias.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>W3C CSS Validation Service</strong></td>
 <td style="text-align: left;">css/iroom.css (versión final)</td>
 <td style="text-align: left;">Sin errores (CSS nivel 3 + SVG).</td>
 <td style="text-align: left;">—</td>
